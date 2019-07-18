@@ -95,12 +95,14 @@ export function attachView(
     }
   }
   const unbindEvents = bindLifecycleEvents(zone, instance, hostElement);
+  componentRef.changeDetectorRef.reattach();
+  componentRef.changeDetectorRef.detectChanges();
+
   container.appendChild(hostElement);
 
   if (!location) {
     appRef.attachView(componentRef.hostView);
   }
-  componentRef.changeDetectorRef.reattach();
   elRefMap.set(hostElement, componentRef);
   elEventsMap.set(hostElement, unbindEvents);
   return hostElement;
