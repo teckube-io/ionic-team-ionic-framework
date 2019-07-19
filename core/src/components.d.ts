@@ -312,6 +312,21 @@ export namespace Components {
     */
     'mode'?: "ios" | "md";
   }
+  interface IonBottomDrawer {
+    /**
+    * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
+    */
+    'cssClass'?: string | string[];
+    /**
+    * The mode determines which platform styles to use.
+    */
+    'mode'?: "ios" | "md";
+    /**
+    * Present the action sheet overlay after it has been created.
+    */
+    'open': () => Promise<void>;
+    'overlayIndex': number;
+  }
   interface IonButton {
     /**
     * The type of button.
@@ -2812,6 +2827,12 @@ declare global {
     new (): HTMLIonBadgeElement;
   };
 
+  interface HTMLIonBottomDrawerElement extends Components.IonBottomDrawer, HTMLStencilElement {}
+  var HTMLIonBottomDrawerElement: {
+    prototype: HTMLIonBottomDrawerElement;
+    new (): HTMLIonBottomDrawerElement;
+  };
+
   interface HTMLIonButtonElement extends Components.IonButton, HTMLStencilElement {}
   var HTMLIonButtonElement: {
     prototype: HTMLIonButtonElement;
@@ -3350,6 +3371,7 @@ declare global {
     'ion-back-button': HTMLIonBackButtonElement;
     'ion-backdrop': HTMLIonBackdropElement;
     'ion-badge': HTMLIonBadgeElement;
+    'ion-bottom-drawer': HTMLIonBottomDrawerElement;
     'ion-button': HTMLIonButtonElement;
     'ion-buttons': HTMLIonButtonsElement;
     'ion-card': HTMLIonCardElement;
@@ -3653,6 +3675,32 @@ declare namespace LocalJSX {
     * The mode determines which platform styles to use.
     */
     'mode'?: "ios" | "md";
+  }
+  interface IonBottomDrawer extends JSXBase.HTMLAttributes<HTMLIonBottomDrawerElement> {
+    /**
+    * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
+    */
+    'cssClass'?: string | string[];
+    /**
+    * The mode determines which platform styles to use.
+    */
+    'mode'?: "ios" | "md";
+    /**
+    * Emitted after the drawer has closed.
+    */
+    'onIonBottomDrawerDidClsoe'?: (event: CustomEvent<void>) => void;
+    /**
+    * Emitted after the drawer has opened.
+    */
+    'onIonBottomDrawerDidOpen'?: (event: CustomEvent<void>) => void;
+    /**
+    * Emitted before the drawer has closed.
+    */
+    'onIonBottomDrawerWillClose'?: (event: CustomEvent<void>) => void;
+    /**
+    * Emitted before the drawer has opened.
+    */
+    'onIonBottomDrawerWillOpen'?: (event: CustomEvent<void>) => void;
   }
   interface IonButton extends JSXBase.HTMLAttributes<HTMLIonButtonElement> {
     /**
@@ -6018,6 +6066,7 @@ declare namespace LocalJSX {
     'ion-back-button': IonBackButton;
     'ion-backdrop': IonBackdrop;
     'ion-badge': IonBadge;
+    'ion-bottom-drawer': IonBottomDrawer;
     'ion-button': IonButton;
     'ion-buttons': IonButtons;
     'ion-card': IonCard;

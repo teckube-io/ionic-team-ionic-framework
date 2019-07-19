@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Bottom Drawer - Standalone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link href="../../../../../css/core.css" rel="stylesheet">
+  <link href="../../../../../scripts/testing/styles.css" rel="stylesheet">
+  <script src="../../../../../scripts/testing/scripts.js"></script>
+  <script nomodule src="../../../../../dist/ionic/ionic.js"></script>
+  <script type="module" src="../../../../../dist/ionic/ionic.esm.js"></script></head>
+
+<body class="ion-padding">
+  <h1>Default</h1>
+
+  <ion-bottom-drawer id="drawer">
+  </ion-bottom-drawer>
+  <script>
+    const drawer = document.querySelector('#drawer');
+    drawer.innerHTML = `
+    <ion-content>
+      <ion-list>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="person" />
+          </ion-avatar>
+          <ion-label>
+            Are you here now?
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="share" />
+          </ion-avatar>
+          <ion-label>
+            Share with a friend
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="planet" />
+          </ion-avatar>
+          <ion-label>
+            mars.nasa.gov
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      <div class="info">
+        <h3>Description</h3>
+        <p>
+          Mars is the fourth planet from the Sun and the second-smallest planet in the Solar System after Mercury. In English, Mars carries a name of the Roman god of war, and is often referred to as the "Red Planet"[15][16] because the iron oxide prevalent on its surface gives it a reddish appearance that is distinctive among the astronomical bodies visible to the naked eye.[17] Mars is a terrestrial planet with a thin atmosphere, having surface features reminiscent both of the impact craters of the Moon and the valleys, deserts, and polar ice caps of Earth.
+        </p>
+      </div>
+    </ion-content>
+    `;
+  </script>
+</body>
+</html>
