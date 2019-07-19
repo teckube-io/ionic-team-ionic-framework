@@ -318,6 +318,10 @@ export namespace Components {
     */
     'cssClass'?: string | string[];
     /**
+    * Whether the drawer is expanded
+    */
+    'expanded': boolean;
+    /**
     * The mode determines which platform styles to use.
     */
     'mode'?: "ios" | "md";
@@ -326,6 +330,7 @@ export namespace Components {
     */
     'open': () => Promise<void>;
     'overlayIndex': number;
+    'startOffset': number;
   }
   interface IonButton {
     /**
@@ -3682,6 +3687,10 @@ declare namespace LocalJSX {
     */
     'cssClass'?: string | string[];
     /**
+    * Whether the drawer is expanded
+    */
+    'expanded'?: boolean;
+    /**
     * The mode determines which platform styles to use.
     */
     'mode'?: "ios" | "md";
@@ -3701,6 +3710,7 @@ declare namespace LocalJSX {
     * Emitted before the drawer has opened.
     */
     'onIonBottomDrawerWillOpen'?: (event: CustomEvent<void>) => void;
+    'startOffset'?: number;
   }
   interface IonButton extends JSXBase.HTMLAttributes<HTMLIonButtonElement> {
     /**
