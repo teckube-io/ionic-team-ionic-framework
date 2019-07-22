@@ -35,7 +35,7 @@ export class BottomDrawer implements ComponentInterface {
    * Whether the drawer is expanded
    */
   @Prop() expanded = false;
-  @Prop() startOffset = 200;
+  @Prop() startOffset = 20;
   @State() active = false;
   // Animation duration
   animationDuration = 400;
@@ -186,7 +186,6 @@ export class BottomDrawer implements ComponentInterface {
 
   private onGestureMove = (detail: GestureDetail) => {
     const dy = this.lastY ? detail.currentY - this.lastY : 0;
-    console.log('DY', dy);
     if (this.y <= this.topPadding) {
       // Grow the content area slightly
       this.growContentHeight(this.topPadding - this.y);
