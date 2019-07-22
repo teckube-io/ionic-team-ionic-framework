@@ -35,7 +35,7 @@ export class BottomDrawer implements ComponentInterface {
    * Whether the drawer is expanded
    */
   @Prop() expanded = false;
-  @Prop() startOffset = 20;
+  @Prop() startOffset = 200;
   @State() active = false;
   // Animation duration
   animationDuration = 400;
@@ -46,6 +46,7 @@ export class BottomDrawer implements ComponentInterface {
   y = 0;
   lastY = 0;
   gesture?: Gesture;
+  scrollElement?: HTMLElement;
 
   /** @internal */
   @Prop() overlayIndex!: number;
@@ -121,6 +122,13 @@ export class BottomDrawer implements ComponentInterface {
       onMove: detail => this.onGestureMove(detail),
       onEnd: detail => this.onGestureEnd(detail)
     });
+
+    this.gesture.setDisabled(false);
+
+    const contentEl = this.el.querySelector('ion-content');
+    if (contentEl) {
+      this.scrollElement = await (contentEl as HTMLIonContentElement).getScrollElement();
+    }
   }
 
     // Check if the device has a notch
@@ -154,11 +162,20 @@ export class BottomDrawer implements ComponentInterface {
   }
 
   private canStart = (detail: GestureDetail): boolean => {
+    console.log('Can start?', detail);
     const target = detail.event.target as HTMLElement;
     let n = target;
-    while (n) {
+    while (n && n !== this.el) {
       if (n.tagName === 'ION-CONTENT') {
-        return false;
+        if (this.scrollElement) {
+          // If the element is scrollable then we won't allow the drag. Add an extra pixel to the clientHeight
+          // to account for an extra pixel in height in content (not sure why there's an extra pixel in content scroll but it's there)
+          if (this.scrollElement.scrollHeight > this.scrollElement.clientHeight + 1) {
+            console.log('Scrolling', this.scrollElement.scrollHeight, this.scrollElement.clientHeight);
+            return false;
+          }
+        }
+        return true;
       }
       n = n.parentElement as HTMLElement;
     }
@@ -166,11 +183,13 @@ export class BottomDrawer implements ComponentInterface {
   }
 
   private onGestureStart = (_detail: GestureDetail) => {
+    console.log('On start');
     this.disableTransition();
   }
 
   private onGestureMove = (detail: GestureDetail) => {
     const dy = this.lastY ? detail.currentY - this.lastY : 0;
+    console.log('DY', dy);
     if (this.y <= this.topPadding) {
       // Grow the content area slightly
       this.growContentHeight(this.topPadding - this.y);
