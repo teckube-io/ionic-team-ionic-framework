@@ -3,7 +3,7 @@ import { Component, ComponentInterface, Element, Event, EventEmitter, Method, Pr
 import { getIonMode } from '../../global/ionic-global';
 import { Animation } from '../../interface';
 import { getClassMap } from '../../utils/theme';
-import { GestureDetail } from '../../utils/gesture';
+import { GestureDetail, Gesture } from '../../utils/gesture';
 
 /*
 import { iosEnterAnimation } from './animations/ios.enter';
@@ -43,7 +43,9 @@ export class BottomDrawer implements ComponentInterface {
   topPadding = 20;
   height = 0;
   // Current y position of element
-  y: number = 0;
+  y = 0;
+  lastY = 0;
+  gesture?: Gesture;
 
   /** @internal */
   @Prop() overlayIndex!: number;
@@ -106,7 +108,7 @@ export class BottomDrawer implements ComponentInterface {
       this.enableTransition();
     });
 
-    const gesture = (await import('../../utils/gesture')).createGesture({
+    this.gesture = (await import('../../utils/gesture')).createGesture({
       el: this.el,
       gestureName: 'bottomDrawerExpand',
       gesturePriority: 110,
@@ -128,7 +130,8 @@ export class BottomDrawer implements ComponentInterface {
       let div = document.createElement('div');
       div.style.paddingBottom = 'env(safe-area-inset-bottom)';
       document.body.appendChild(div);
-      let calculatedPadding = parseInt(window.getComputedStyle(div).paddingBottom, 10);
+      const paddingBottomStyle = window.getComputedStyle(div).paddingBottom;
+      const calculatedPadding = parseInt(paddingBottomStyle || '0', 10);
       console.log('Calculated padding', calculatedPadding);
       document.body.removeChild(div);
       if (calculatedPadding > 0) {
@@ -167,17 +170,19 @@ export class BottomDrawer implements ComponentInterface {
   }
 
   private onGestureMove = (detail: GestureDetail) => {
+    const dy = this.lastY ? detail.currentY - this.lastY : 0;
     if (this.y <= this.topPadding) {
       // Grow the content area slightly
       this.growContentHeight(this.topPadding - this.y);
-      // When we're above the limit, let the user pull but at a 
+      // When we're above the limit, let the user pull but at a
       // slower rate (to give a sense of friction)
-      this.slideBy(detail.dy * 0.3);
+      this.slideBy(dy * 0.3);
     } else {
       this.growContentHeight(0);
-      this.slideBy(detail.dy);
+      this.slideBy(dy);
     }
 
+    this.lastY = detail.currentY;
     // this.onPositionChange && this.onPositionChange(detail);
   }
 
@@ -185,10 +190,10 @@ export class BottomDrawer implements ComponentInterface {
     this.enableTransition();
 
     let expanded;
-    if (detail.vy < -0.6) {
+    if (detail.velocityY < -0.6) {
       this.slideOpen();
       expanded = true;
-    } else if(detail.vy > 0.6) {
+    } else if(detail.velocityY > 0.6) {
       this.slideClose();
       expanded = false;
     } else if (this.y <= this.height / 2) {
@@ -205,7 +210,7 @@ export class BottomDrawer implements ComponentInterface {
       this.fireClose();
     }
   }
-  
+
   private disableTransition() {
     this.el.style.transition = '';
   }
