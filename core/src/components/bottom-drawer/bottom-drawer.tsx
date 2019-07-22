@@ -162,7 +162,6 @@ export class BottomDrawer implements ComponentInterface {
   }
 
   private canStart = (detail: GestureDetail): boolean => {
-    console.log('Can start?', detail);
     const target = detail.event.target as HTMLElement;
     let n = target;
     while (n && n !== this.el) {
@@ -171,7 +170,6 @@ export class BottomDrawer implements ComponentInterface {
           // If the element is scrollable then we won't allow the drag. Add an extra pixel to the clientHeight
           // to account for an extra pixel in height in content (not sure why there's an extra pixel in content scroll but it's there)
           if (this.scrollElement.scrollHeight > this.scrollElement.clientHeight + 1) {
-            console.log('Scrolling', this.scrollElement.scrollHeight, this.scrollElement.clientHeight);
             return false;
           }
         }
@@ -183,7 +181,6 @@ export class BottomDrawer implements ComponentInterface {
   }
 
   private onGestureStart = (_detail: GestureDetail) => {
-    console.log('On start');
     this.disableTransition();
   }
 
@@ -208,11 +205,13 @@ export class BottomDrawer implements ComponentInterface {
   private onGestureEnd = (detail: GestureDetail) => {
     this.enableTransition();
 
+    this.lastY = 0;
+
     let expanded;
     if (detail.velocityY < -0.6) {
       this.slideOpen();
       expanded = true;
-    } else if(detail.velocityY > 0.6) {
+    } else if (detail.velocityY > 0.6) {
       this.slideClose();
       expanded = false;
     } else if (this.y <= this.height / 2) {
