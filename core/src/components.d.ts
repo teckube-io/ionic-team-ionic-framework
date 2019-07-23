@@ -318,7 +318,7 @@ export namespace Components {
     */
     'cssClass'?: string | string[];
     /**
-    * Whether the drawer is expanded
+    * Whether the drawer is expanded.
     */
     'expanded': boolean;
     /**
@@ -329,8 +329,15 @@ export namespace Components {
     * Present the action sheet overlay after it has been created.
     */
     'open': () => Promise<void>;
+    /**
+    * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    */
+    'openHeight'?: number;
     'overlayIndex': number;
-    'startOffset': number;
+    /**
+    * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
+    */
+    'startOffset'?: number;
   }
   interface IonButton {
     /**
@@ -3687,7 +3694,7 @@ declare namespace LocalJSX {
     */
     'cssClass'?: string | string[];
     /**
-    * Whether the drawer is expanded
+    * Whether the drawer is expanded.
     */
     'expanded'?: boolean;
     /**
@@ -3697,7 +3704,7 @@ declare namespace LocalJSX {
     /**
     * Emitted after the drawer has closed.
     */
-    'onIonBottomDrawerDidClsoe'?: (event: CustomEvent<void>) => void;
+    'onIonBottomDrawerDidClose'?: (event: CustomEvent<void>) => void;
     /**
     * Emitted after the drawer has opened.
     */
@@ -3710,6 +3717,13 @@ declare namespace LocalJSX {
     * Emitted before the drawer has opened.
     */
     'onIonBottomDrawerWillOpen'?: (event: CustomEvent<void>) => void;
+    /**
+    * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    */
+    'openHeight'?: number;
+    /**
+    * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
+    */
     'startOffset'?: number;
   }
   interface IonButton extends JSXBase.HTMLAttributes<HTMLIonButtonElement> {

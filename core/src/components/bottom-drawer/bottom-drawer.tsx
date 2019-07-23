@@ -28,15 +28,6 @@ export class BottomDrawer implements ComponentInterface {
   presented = false;
   animation?: Animation;
   mode = getIonMode(this);
-
-  @Element() el!: HTMLElement;
-
-  /**
-   * Whether the drawer is expanded
-   */
-  @Prop() expanded = false;
-  @Prop() startOffset = 20;
-  @State() active = false;
   // Animation duration
   animationDuration = 400;
   // Distance from the top
@@ -47,6 +38,26 @@ export class BottomDrawer implements ComponentInterface {
   lastY = 0;
   gesture?: Gesture;
   scrollElement?: HTMLElement;
+
+
+  @Element() el!: HTMLElement;
+
+  /**
+   * Whether the drawer is expanded.
+   */
+  @Prop() expanded = false;
+  /**
+   * The starting position of the drawer, from the bottom of the screen. If not set,
+   * the drawer will not be visible until it is shown
+   */
+  @Prop() startOffset?: number;
+  /**
+   * The height of the element when opened. If not set, the height will be computed
+   * and set to the height of the screen minus some padding for any top notch
+   */
+  @Prop() openHeight?: number;
+
+  @State() active = false;
 
   /** @internal */
   @Prop() overlayIndex!: number;
@@ -70,7 +81,7 @@ export class BottomDrawer implements ComponentInterface {
   /**
    * Emitted after the drawer has closed.
    */
-  @Event({ eventName: 'ionBottomDrawerDidClsoe' }) didClose!: EventEmitter<void>;
+  @Event({ eventName: 'ionBottomDrawerDidClose' }) didClose!: EventEmitter<void>;
 
   /**
    * Emitted before the drawer has closed.
@@ -85,7 +96,14 @@ export class BottomDrawer implements ComponentInterface {
       this.topPadding = 40;
     }
 
-    this.y = screenHeight - this.startOffset;
+    // Set the starting Y position 
+    if (this.startOffset) {
+      // If the starting offset is set, use that
+      this.y = screenHeight - this.startOffset;
+    } else {
+      // Otherwise, make the draw be off screen
+      this.y = screenHeight + 20;
+    }
 
     /*
     this.onPositionChange && this.onPositionChange({
@@ -125,13 +143,16 @@ export class BottomDrawer implements ComponentInterface {
 
     this.gesture.setDisabled(false);
 
+    // Grab the main scroll region in the provided content which will be used
+    // to handle the drag detection and block dragging when the user intends
+    // to scroll the content instead
     const contentEl = this.el.querySelector('ion-content');
     if (contentEl) {
       this.scrollElement = await (contentEl as HTMLIonContentElement).getScrollElement();
     }
   }
 
-    // Check if the device has a notch
+  // Check if the device has a notch
   // From https://stackoverflow.com/a/48572849
   private hasNotch() {
     if (CSS.supports('padding-bottom: env(safe-area-inset-bottom)')) {
@@ -153,10 +174,15 @@ export class BottomDrawer implements ComponentInterface {
 
   private sizeElement() {
     const e = this.el;
-    const screenHeight = window.innerHeight;
 
     // this.contentHeight = screenHeight - this.startOffset;
-    this.height = (screenHeight - this.topPadding);
+
+    if (this.openHeight) {
+      this.height = this.openHeight;
+    } else {
+      const screenHeight = window.innerHeight;
+      this.height = (screenHeight - this.topPadding);
+    }
 
     e.style.height = `${this.height}px`;
   }
@@ -252,7 +278,9 @@ export class BottomDrawer implements ComponentInterface {
 
   private slideOpen() {
     // const startY = this.y;
-    this.slideTo(this.topPadding);
+    // const screenHeight = window.innerHeight;
+    // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
+    this.slideTo(this.getExpandedY())
     this.afterTransition(() => {
       this.growContentHeight(0);
     });
@@ -272,17 +300,39 @@ export class BottomDrawer implements ComponentInterface {
   }
 
   private getExpandedY() {
-    return this.topPadding;
+    if (this.openHeight) {
+      const screenHeight = window.innerHeight;
+      return screenHeight - this.openHeight;
+    } else {
+      return this.topPadding;
+    }
   }
 
   private getCollapsedY() {
     const screenHeight = window.innerHeight;
-    return screenHeight - this.startOffset;
+    if (this.startOffset) {
+      return screenHeight - this.startOffset;
+    }
+
+    return screenHeight + 20;
   }
 
-  private fireToggled(_isExpanded: boolean, _finalY: number) {
+  private fireToggled(isExpanded: boolean, _finalY: number) {
     // this.menuToggle.emit(isExpanded);
     // this.onMenuToggled && this.onMenuToggled(isExpanded, finalY);
+    if (isExpanded) {
+      this.willOpen.emit();
+      setTimeout(() => {
+        this.didOpen.emit();
+        // TODO: Make this more better
+      }, 400);
+    } else {
+      this.willClose.emit();
+      setTimeout(() => {
+        this.didClose.emit();
+        // TODO: Make this more better
+      }, 400);
+    }
   }
 
   private fireOpen() {
@@ -321,6 +371,7 @@ export class BottomDrawer implements ComponentInterface {
    */
   @Method()
   open(): Promise<void> {
+    this.fireOpen();
     return Promise.resolve();
   }
 

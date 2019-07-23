@@ -61,21 +61,21 @@ export class IonBadge {
 proxyInputs(IonBadge, ['color', 'mode']);
 
 export declare interface IonBottomDrawer extends Components.IonBottomDrawer {}
-@Component({ selector: 'ion-bottom-drawer', changeDetection: ChangeDetectionStrategy.OnPush, template: '<ng-content></ng-content>', inputs: ['cssClass', 'expanded', 'mode', 'startOffset'] })
+@Component({ selector: 'ion-bottom-drawer', changeDetection: ChangeDetectionStrategy.OnPush, template: '<ng-content></ng-content>', inputs: ['cssClass', 'expanded', 'mode', 'openHeight', 'startOffset'] })
 export class IonBottomDrawer {
   ionBottomDrawerDidOpen!: EventEmitter<CustomEvent>;
   ionBottomDrawerWillOpen!: EventEmitter<CustomEvent>;
-  ionBottomDrawerDidClsoe!: EventEmitter<CustomEvent>;
+  ionBottomDrawerDidClose!: EventEmitter<CustomEvent>;
   ionBottomDrawerWillClose!: EventEmitter<CustomEvent>;
   protected el: HTMLElement;
   constructor(c: ChangeDetectorRef, r: ElementRef) {
     c.detach();
     this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['ionBottomDrawerDidOpen', 'ionBottomDrawerWillOpen', 'ionBottomDrawerDidClsoe', 'ionBottomDrawerWillClose']);
+    proxyOutputs(this, this.el, ['ionBottomDrawerDidOpen', 'ionBottomDrawerWillOpen', 'ionBottomDrawerDidClose', 'ionBottomDrawerWillClose']);
   }
 }
 proxyMethods(IonBottomDrawer, ['open']);
-proxyInputs(IonBottomDrawer, ['cssClass', 'expanded', 'mode', 'startOffset']);
+proxyInputs(IonBottomDrawer, ['cssClass', 'expanded', 'mode', 'openHeight', 'startOffset']);
 
 export declare interface IonButton extends Components.IonButton {}
 @Component({ selector: 'ion-button', changeDetection: ChangeDetectionStrategy.OnPush, template: '<ng-content></ng-content>', inputs: ['buttonType', 'color', 'disabled', 'download', 'expand', 'fill', 'href', 'mode', 'rel', 'routerDirection', 'shape', 'size', 'strong', 'target', 'type'] })
