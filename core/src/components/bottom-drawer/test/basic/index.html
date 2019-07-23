@@ -14,14 +14,21 @@
 <body class="ion-padding">
   <h1>Default</h1>
 
-  <ion-button onclick="show()">Show</ion-button>
+  <ion-button onclick="showDrawer()">Show</ion-button>
+  <ion-button onclick="closeDrawer()">Close</ion-button>
 
   <ion-bottom-drawer id="drawer" open-height="300">
   </ion-bottom-drawer>
   <script>
-    function show() {
+    function showDrawer() {
       const drawer = document.querySelector('ion-bottom-drawer');
       drawer.expanded = true;
+    }
+
+    function closeDrawer() {
+      const drawer = document.querySelector('ion-bottom-drawer');
+      console.log('Closing drawer');
+      drawer.expanded = false;
     }
 
     const drawer = document.querySelector('#drawer');

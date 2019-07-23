@@ -287,6 +287,7 @@ export class BottomDrawer implements ComponentInterface {
   }
 
   private slideClose() {
+    console.log('Sliding close');
     // const startY = this.y;
     const finalY = this.getCollapsedY();
     this.slideTo(finalY);
@@ -347,8 +348,10 @@ export class BottomDrawer implements ComponentInterface {
   handleExpandedChange() {
     if (this.expanded) {
       this.slideOpen();
+      this.fireOpen();
     } else {
       this.slideClose();
+      this.fireClose();
     }
   }
 
