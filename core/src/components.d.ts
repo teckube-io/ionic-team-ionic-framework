@@ -4155,19 +4155,11 @@ declare namespace LocalJSX {
     /**
     * Emitted after the drawer has closed.
     */
-    'onIonDrawerDidClose'?: (event: CustomEvent<void>) => void;
+    'onIonDrawerClose'?: (event: CustomEvent<void>) => void;
     /**
     * Emitted after the drawer has opened.
     */
-    'onIonDrawerDidOpen'?: (event: CustomEvent<void>) => void;
-    /**
-    * Emitted before the drawer has closed.
-    */
-    'onIonDrawerWillClose'?: (event: CustomEvent<void>) => void;
-    /**
-    * Emitted before the drawer has opened.
-    */
-    'onIonDrawerWillOpen'?: (event: CustomEvent<void>) => void;
+    'onIonDrawerOpen'?: (event: CustomEvent<void>) => void;
     /**
     * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
     */

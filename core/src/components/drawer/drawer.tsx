@@ -84,22 +84,12 @@ export class Drawer implements ComponentInterface {
   /**
    * Emitted after the drawer has opened.
    */
-  @Event({ eventName: 'ionDrawerDidOpen' }) didOpen!: EventEmitter<void>;
-
-  /**
-   * Emitted before the drawer has opened.
-   */
-  @Event({ eventName: 'ionDrawerWillOpen' }) willOpen!: EventEmitter<void>;
+  @Event({ eventName: 'ionDrawerOpen' }) didOpen!: EventEmitter<void>;
 
   /**
    * Emitted after the drawer has closed.
    */
-  @Event({ eventName: 'ionDrawerDidClose' }) didClose!: EventEmitter<void>;
-
-  /**
-   * Emitted before the drawer has closed.
-   */
-  @Event({ eventName: 'ionDrawerWillClose' }) willClose!: EventEmitter<void>;
+  @Event({ eventName: 'ionDrawerClose' }) didClose!: EventEmitter<void>;
 
   async componentDidLoad() {
     const screenHeight = window.innerHeight;
@@ -399,22 +389,10 @@ export class Drawer implements ComponentInterface {
   }
 
   private fireToggled(isOpened: boolean, _finalY: number) {
-    console.log('FIRE TOGGLED', isOpened);
-    console.trace();
-    // this.menuToggle.emit(isExpanded);
-    // this.onMenuToggled && this.onMenuToggled(isExpanded, finalY);
     if (isOpened) {
-      this.willOpen.emit();
-      setTimeout(() => {
-        this.didOpen.emit();
-        // TODO: Make this more better
-      }, 400);
+      this.didOpen.emit();
     } else {
-      this.willClose.emit();
-      setTimeout(() => {
-        this.didClose.emit();
-        // TODO: Make this more better
-      }, 400);
+      this.didClose.emit();
     }
   }
 
@@ -428,7 +406,6 @@ export class Drawer implements ComponentInterface {
 
   @Watch('opened')
   handleOpenedChange() {
-    console.log('OPENED CHANGED', this.opened, this.isOpen(), this.isClosed());
     if (this.opened && !this.isOpen()) {
       this.slideOpen();
     } else if (!this.opened && !this.isClosed()) {

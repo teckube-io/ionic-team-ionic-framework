@@ -36,7 +36,7 @@
     }
 
     const drawer = document.querySelector('#drawer');
-    drawer.addEventListener('ionDrawerDidClose', (e) => {
+    drawer.addEventListener('ionDrawerClose', (e) => {
       console.log('Drawer closed!', e);
       drawer.opened = false;
     });
