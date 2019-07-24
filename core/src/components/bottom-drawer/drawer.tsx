@@ -16,14 +16,14 @@ import { mdLeaveAnimation } from './animations/md.leave';
  * @virtualProp {"ios" | "md"} mode - The mode determines which platform styles to use.
  */
 @Component({
-  tag: 'ion-bottom-drawer',
+  tag: 'ion-drawer',
   styleUrls: {
-    ios: 'bottom-drawer.ios.scss',
-    md: 'bottom-drawer.md.scss'
+    ios: 'drawer.ios.scss',
+    md: 'drawer.md.scss'
   },
   shadow: true
 })
-export class BottomDrawer implements ComponentInterface {
+export class Drawer implements ComponentInterface {
 
   presented = false;
   animation?: Animation;
@@ -71,22 +71,22 @@ export class BottomDrawer implements ComponentInterface {
   /**
    * Emitted after the drawer has opened.
    */
-  @Event({ eventName: 'ionBottomDrawerDidOpen' }) didOpen!: EventEmitter<void>;
+  @Event({ eventName: 'ionDrawerDidOpen' }) didOpen!: EventEmitter<void>;
 
   /**
    * Emitted before the drawer has opened.
    */
-  @Event({ eventName: 'ionBottomDrawerWillOpen' }) willOpen!: EventEmitter<void>;
+  @Event({ eventName: 'ionDrawerWillOpen' }) willOpen!: EventEmitter<void>;
 
   /**
    * Emitted after the drawer has closed.
    */
-  @Event({ eventName: 'ionBottomDrawerDidClose' }) didClose!: EventEmitter<void>;
+  @Event({ eventName: 'ionDrawerDidClose' }) didClose!: EventEmitter<void>;
 
   /**
    * Emitted before the drawer has closed.
    */
-  @Event({ eventName: 'ionBottomDrawerWillClose' }) willClose!: EventEmitter<void>;
+  @Event({ eventName: 'ionDrawerWillClose' }) willClose!: EventEmitter<void>;
 
   async componentDidLoad() {
     const screenHeight = window.innerHeight;
@@ -129,7 +129,7 @@ export class BottomDrawer implements ComponentInterface {
 
     this.gesture = (await import('../../utils/gesture')).createGesture({
       el: this.el,
-      gestureName: 'bottomDrawerExpand',
+      gestureName: 'drawerExpand',
       gesturePriority: 110,
       threshold: 0,
       direction: 'y',
@@ -166,8 +166,6 @@ export class BottomDrawer implements ComponentInterface {
       if (calculatedPadding > 0) {
         return true;
       }
-    } else {
-      console.log('Does not support safe-area-inset-bottom');
     }
     return false;
   }
@@ -399,12 +397,12 @@ export class BottomDrawer implements ComponentInterface {
     // const mode = getIonMode(this);
 
     return [
-      <div class="bottom-drawer-wrapper" role="dialog">
-        <div class="bottom-drawer-content">
-          <div class="bottom-drawer-lip">
-            <div class="bottom-drawer-lip-icon"></div>
+      <div class="drawer-wrapper" role="dialog">
+        <div class="drawer-content">
+          <div class="drawer-lip">
+            <div class="drawer-lip-icon"></div>
           </div>
-          <div class="bottom-drawer-slotted-content">
+          <div class="drawer-slotted-content">
             <slot />
           </div>
         </div>

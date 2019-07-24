@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Bottom Drawer - Standalone</title>
+  <title>Drawer - Standalone</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link href="../../../../../css/core.css" rel="stylesheet">
   <link href="../../../../../scripts/testing/styles.css" rel="stylesheet">
@@ -17,22 +17,22 @@
   <ion-button onclick="showDrawer()">Show</ion-button>
   <ion-button onclick="closeDrawer()">Close</ion-button>
 
-  <ion-bottom-drawer id="drawer" open-height="300">
-  </ion-bottom-drawer>
+  <ion-drawer id="drawer" open-height="300">
+  </ion-drawer>
   <script>
     function showDrawer() {
-      const drawer = document.querySelector('ion-bottom-drawer');
+      const drawer = document.querySelector('ion-drawer');
       drawer.expanded = true;
     }
 
     function closeDrawer() {
-      const drawer = document.querySelector('ion-bottom-drawer');
+      const drawer = document.querySelector('ion-drawer');
       console.log('Closing drawer');
       drawer.expanded = false;
     }
 
     const drawer = document.querySelector('#drawer');
-    drawer.addEventListener('ionBottomDrawerDidClose', (e) => {
+    drawer.addEventListener('ionDrawerDidClose', (e) => {
       console.log('Drawer closed!', e);
       drawer.expanded = false;
     });

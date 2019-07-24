@@ -312,33 +312,6 @@ export namespace Components {
     */
     'mode'?: "ios" | "md";
   }
-  interface IonBottomDrawer {
-    /**
-    * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
-    */
-    'cssClass'?: string | string[];
-    /**
-    * Whether the drawer is expanded.
-    */
-    'expanded': boolean;
-    /**
-    * The mode determines which platform styles to use.
-    */
-    'mode'?: "ios" | "md";
-    /**
-    * Present the action sheet overlay after it has been created.
-    */
-    'open': () => Promise<void>;
-    /**
-    * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
-    */
-    'openHeight'?: number;
-    'overlayIndex': number;
-    /**
-    * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
-    */
-    'startOffset'?: number;
-  }
   interface IonButton {
     /**
     * The type of button.
@@ -765,6 +738,33 @@ export namespace Components {
     * Values used to create the list of selectable years. By default the year values range between the `min` and `max` datetime inputs. However, to control exactly which years to display, the `yearValues` input can take a number, an array of numbers, or string of comma separated numbers. For example, to show upcoming and recent leap years, then this input's value would be `yearValues="2024,2020,2016,2012,2008"`.
     */
     'yearValues'?: number[] | number | string;
+  }
+  interface IonDrawer {
+    /**
+    * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
+    */
+    'cssClass'?: string | string[];
+    /**
+    * Whether the drawer is expanded.
+    */
+    'expanded': boolean;
+    /**
+    * The mode determines which platform styles to use.
+    */
+    'mode'?: "ios" | "md";
+    /**
+    * Present the action sheet overlay after it has been created.
+    */
+    'open': () => Promise<void>;
+    /**
+    * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    */
+    'openHeight'?: number;
+    'overlayIndex': number;
+    /**
+    * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
+    */
+    'startOffset'?: number;
   }
   interface IonFab {
     /**
@@ -2839,12 +2839,6 @@ declare global {
     new (): HTMLIonBadgeElement;
   };
 
-  interface HTMLIonBottomDrawerElement extends Components.IonBottomDrawer, HTMLStencilElement {}
-  var HTMLIonBottomDrawerElement: {
-    prototype: HTMLIonBottomDrawerElement;
-    new (): HTMLIonBottomDrawerElement;
-  };
-
   interface HTMLIonButtonElement extends Components.IonButton, HTMLStencilElement {}
   var HTMLIonButtonElement: {
     prototype: HTMLIonButtonElement;
@@ -2915,6 +2909,12 @@ declare global {
   var HTMLIonDatetimeElement: {
     prototype: HTMLIonDatetimeElement;
     new (): HTMLIonDatetimeElement;
+  };
+
+  interface HTMLIonDrawerElement extends Components.IonDrawer, HTMLStencilElement {}
+  var HTMLIonDrawerElement: {
+    prototype: HTMLIonDrawerElement;
+    new (): HTMLIonDrawerElement;
   };
 
   interface HTMLIonFabElement extends Components.IonFab, HTMLStencilElement {}
@@ -3383,7 +3383,6 @@ declare global {
     'ion-back-button': HTMLIonBackButtonElement;
     'ion-backdrop': HTMLIonBackdropElement;
     'ion-badge': HTMLIonBadgeElement;
-    'ion-bottom-drawer': HTMLIonBottomDrawerElement;
     'ion-button': HTMLIonButtonElement;
     'ion-buttons': HTMLIonButtonsElement;
     'ion-card': HTMLIonCardElement;
@@ -3396,6 +3395,7 @@ declare global {
     'ion-col': HTMLIonColElement;
     'ion-content': HTMLIonContentElement;
     'ion-datetime': HTMLIonDatetimeElement;
+    'ion-drawer': HTMLIonDrawerElement;
     'ion-fab': HTMLIonFabElement;
     'ion-fab-button': HTMLIonFabButtonElement;
     'ion-fab-list': HTMLIonFabListElement;
@@ -3687,44 +3687,6 @@ declare namespace LocalJSX {
     * The mode determines which platform styles to use.
     */
     'mode'?: "ios" | "md";
-  }
-  interface IonBottomDrawer extends JSXBase.HTMLAttributes<HTMLIonBottomDrawerElement> {
-    /**
-    * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
-    */
-    'cssClass'?: string | string[];
-    /**
-    * Whether the drawer is expanded.
-    */
-    'expanded'?: boolean;
-    /**
-    * The mode determines which platform styles to use.
-    */
-    'mode'?: "ios" | "md";
-    /**
-    * Emitted after the drawer has closed.
-    */
-    'onIonBottomDrawerDidClose'?: (event: CustomEvent<void>) => void;
-    /**
-    * Emitted after the drawer has opened.
-    */
-    'onIonBottomDrawerDidOpen'?: (event: CustomEvent<void>) => void;
-    /**
-    * Emitted before the drawer has closed.
-    */
-    'onIonBottomDrawerWillClose'?: (event: CustomEvent<void>) => void;
-    /**
-    * Emitted before the drawer has opened.
-    */
-    'onIonBottomDrawerWillOpen'?: (event: CustomEvent<void>) => void;
-    /**
-    * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
-    */
-    'openHeight'?: number;
-    /**
-    * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
-    */
-    'startOffset'?: number;
   }
   interface IonButton extends JSXBase.HTMLAttributes<HTMLIonButtonElement> {
     /**
@@ -4176,6 +4138,44 @@ declare namespace LocalJSX {
     * Values used to create the list of selectable years. By default the year values range between the `min` and `max` datetime inputs. However, to control exactly which years to display, the `yearValues` input can take a number, an array of numbers, or string of comma separated numbers. For example, to show upcoming and recent leap years, then this input's value would be `yearValues="2024,2020,2016,2012,2008"`.
     */
     'yearValues'?: number[] | number | string;
+  }
+  interface IonDrawer extends JSXBase.HTMLAttributes<HTMLIonDrawerElement> {
+    /**
+    * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
+    */
+    'cssClass'?: string | string[];
+    /**
+    * Whether the drawer is expanded.
+    */
+    'expanded'?: boolean;
+    /**
+    * The mode determines which platform styles to use.
+    */
+    'mode'?: "ios" | "md";
+    /**
+    * Emitted after the drawer has closed.
+    */
+    'onIonDrawerDidClose'?: (event: CustomEvent<void>) => void;
+    /**
+    * Emitted after the drawer has opened.
+    */
+    'onIonDrawerDidOpen'?: (event: CustomEvent<void>) => void;
+    /**
+    * Emitted before the drawer has closed.
+    */
+    'onIonDrawerWillClose'?: (event: CustomEvent<void>) => void;
+    /**
+    * Emitted before the drawer has opened.
+    */
+    'onIonDrawerWillOpen'?: (event: CustomEvent<void>) => void;
+    /**
+    * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    */
+    'openHeight'?: number;
+    /**
+    * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
+    */
+    'startOffset'?: number;
   }
   interface IonFab extends JSXBase.HTMLAttributes<HTMLIonFabElement> {
     /**
@@ -6090,7 +6090,6 @@ declare namespace LocalJSX {
     'ion-back-button': IonBackButton;
     'ion-backdrop': IonBackdrop;
     'ion-badge': IonBadge;
-    'ion-bottom-drawer': IonBottomDrawer;
     'ion-button': IonButton;
     'ion-buttons': IonButtons;
     'ion-card': IonCard;
@@ -6103,6 +6102,7 @@ declare namespace LocalJSX {
     'ion-col': IonCol;
     'ion-content': IonContent;
     'ion-datetime': IonDatetime;
+    'ion-drawer': IonDrawer;
     'ion-fab': IonFab;
     'ion-fab-button': IonFabButton;
     'ion-fab-list': IonFabList;

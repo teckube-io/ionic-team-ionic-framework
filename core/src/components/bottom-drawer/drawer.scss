@@ -13,19 +13,19 @@
   --content-bg: #fff;
 }
 
-.bottom-drawer-wrapper {
+.drawer-wrapper {
   width: 100%;
   height: 100%;
 }
 
-.bottom-drawer-lip {
+.drawer-lip {
   width: 100%;
   height: 15px;
   line-height: 11px;
   text-align: center;
 }
 
-.bottom-drawer-lip-icon {
+.drawer-lip-icon {
   display: inline-block;
   vertical-align: middle;
   width: 25px;
@@ -34,7 +34,7 @@
   background-color: #ccc;
 }
 
-.bottom-drawer-content {
+.drawer-content {
   background-color: var(--content-bg);
 
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.20);
@@ -46,6 +46,6 @@
   flex-direction: column;
 }
 
-.bottom-drawer-slotted-content {
+.drawer-slotted-content {
   flex: 1;
 }
