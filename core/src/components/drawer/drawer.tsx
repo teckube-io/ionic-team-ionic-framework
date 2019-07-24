@@ -428,6 +428,7 @@ export class Drawer implements ComponentInterface {
 
   @Watch('opened')
   handleOpenedChange() {
+    console.log('OPENED CHANGED', this.opened, this.isOpen(), this.isClosed());
     if (this.opened && !this.isOpen()) {
       this.slideOpen();
     } else if (!this.opened && !this.isClosed()) {
