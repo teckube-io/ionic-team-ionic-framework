@@ -291,6 +291,8 @@ export class Drawer implements ComponentInterface {
       // If they are just slightly under the max open height, don't close it,
       // otherwise, close it
       opened = this.y < (this.getOpenedY() + 75);
+    } else if (this.y < (this.getOpenedY() + 75)) {
+      opened = false;
     } else if (this.y <= this.height / 2) {
       // If they dragged more than half the screen and the other conditions didn't hit,
       // open it
