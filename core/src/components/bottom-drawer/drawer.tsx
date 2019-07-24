@@ -38,24 +38,32 @@ export class Drawer implements ComponentInterface {
   lastY = 0;
   gesture?: Gesture;
   scrollElement?: HTMLElement;
-
+  // Whether the drawer will scroll based on the content height
+  canScroll = false;
 
   @Element() el!: HTMLElement;
 
   /**
-   * Whether the drawer is expanded.
+   * Whether the drawer is opened.
    */
-  @Prop() expanded = false;
+  @Prop() opened = false;
+
   /**
    * The starting position of the drawer, from the bottom of the screen. If not set,
    * the drawer will not be visible until it is shown
    */
   @Prop() startOffset?: number;
+
   /**
    * The height of the element when opened. If not set, the height will be computed
    * and set to the height of the screen minus some padding for any top notch
    */
   @Prop() openHeight?: number;
+
+  /**
+   * Whether to allow the drawer to open completely, or to stay fixed at a maximum amount (with rubber banding when the user attempts to open it beyond this point)
+   */
+  @Prop()
 
   @State() active = false;
 
@@ -96,14 +104,11 @@ export class Drawer implements ComponentInterface {
       this.topPadding = 40;
     }
 
-    // Set the starting Y position 
-    if (this.startOffset) {
-      // If the starting offset is set, use that
-      this.y = screenHeight - this.startOffset;
-    } else {
-      // Otherwise, make the draw be off screen
-      this.y = screenHeight + 20;
-    }
+    // Set the starting Y position
+    this.y = this.startOffset ? screenHeight - this.startOffset : screenHeight + 20;
+
+    this.sizeElement();
+    this.slideTo(this.y);
 
     /*
     this.onPositionChange && this.onPositionChange({
@@ -118,9 +123,6 @@ export class Drawer implements ComponentInterface {
     });
     */
 
-    this.sizeElement();
-
-    this.slideTo(this.y);
 
     // Wait a frame to enable the animation to avoid having it run on start
     requestAnimationFrame(() => {
@@ -146,10 +148,24 @@ export class Drawer implements ComponentInterface {
     // Grab the main scroll region in the provided content which will be used
     // to handle the drag detection and block dragging when the user intends
     // to scroll the content instead
-    const contentEl = this.el.querySelector('ion-content');
+    const contentEl = this.el.querySelector('ion-content') as HTMLIonContentElement;
     if (contentEl) {
-      this.scrollElement = await (contentEl as HTMLIonContentElement).getScrollElement();
+      this.scrollElement = await contentEl.getScrollElement();
     }
+
+    const contentHeight = contentEl.getBoundingClientRect().height;
+
+    // If the user provided an open height that is more than the non-zero height of the
+    // content, then clip the max open height to the height of the content
+    if (this.openHeight && contentHeight > 0 && contentHeight < this.openHeight) {
+      console.log('Clipping open height to', contentHeight);
+      this.openHeight = contentHeight;
+    }
+    console.log(this.openHeight, contentHeight);
+
+    this.sizeElement();
+
+    this.slideTo(this.y);
   }
 
   // Check if the device has a notch
@@ -230,22 +246,22 @@ export class Drawer implements ComponentInterface {
 
     this.lastY = 0;
 
-    let expanded;
+    let opened;
     if (detail.velocityY < -0.6) {
       this.slideOpen();
-      expanded = true;
+      opened = true;
     } else if (detail.velocityY > 0.6) {
       this.slideClose();
-      expanded = false;
+      opened = false;
     } else if (this.y <= this.height / 2) {
       this.slideOpen();
-      expanded = true;
+      opened = true;
     } else {
       this.slideClose();
-      expanded = false;
+      opened = false;
     }
 
-    if (expanded) {
+    if (opened) {
       this.fireOpen();
     } else {
       this.fireClose();
@@ -278,7 +294,7 @@ export class Drawer implements ComponentInterface {
     // const startY = this.y;
     // const screenHeight = window.innerHeight;
     // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
-    this.slideTo(this.getExpandedY())
+    this.slideTo(this.getOpenedY());
     this.afterTransition(() => {
       this.growContentHeight(0);
     });
@@ -298,7 +314,7 @@ export class Drawer implements ComponentInterface {
     setTimeout(fn, this.animationDuration);
   }
 
-  private getExpandedY() {
+  private getOpenedY() {
     if (this.openHeight) {
       const screenHeight = window.innerHeight;
       return screenHeight - this.openHeight;
@@ -335,16 +351,16 @@ export class Drawer implements ComponentInterface {
   }
 
   private fireOpen() {
-    this.fireToggled(true, this.getExpandedY());
+    this.fireToggled(true, this.getOpenedY());
   }
 
   private fireClose() {
     this.fireToggled(false, this.getCollapsedY());
   }
 
-  @Watch('expanded')
-  handleExpandedChange() {
-    if (this.expanded) {
+  @Watch('opened')
+  handleOpenedChange() {
+    if (this.opened) {
       this.slideOpen();
       this.fireOpen();
     } else {
@@ -358,9 +374,9 @@ export class Drawer implements ComponentInterface {
   }
 
   toggle = (_e: MouseEvent) => {
-    const newExpanded = !this.expanded;
+    const newOpened = !this.opened;
 
-    if (newExpanded) {
+    if (newOpened) {
       this.fireOpen();
     } else {
       this.fireClose();

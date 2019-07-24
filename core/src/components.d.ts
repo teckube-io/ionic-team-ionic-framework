@@ -741,13 +741,13 @@ export namespace Components {
   }
   interface IonDrawer {
     /**
+    * Whether to allow the drawer to open completely, or to stay fixed at a maximum amount (with rubber banding when the user attempts to open it beyond this point)
+    */
+    'active': boolean;
+    /**
     * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
     */
     'cssClass'?: string | string[];
-    /**
-    * Whether the drawer is expanded.
-    */
-    'expanded': boolean;
     /**
     * The mode determines which platform styles to use.
     */
@@ -760,6 +760,10 @@ export namespace Components {
     * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
     */
     'openHeight'?: number;
+    /**
+    * Whether the drawer is opened.
+    */
+    'opened': boolean;
     'overlayIndex': number;
     /**
     * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
@@ -4141,13 +4145,13 @@ declare namespace LocalJSX {
   }
   interface IonDrawer extends JSXBase.HTMLAttributes<HTMLIonDrawerElement> {
     /**
+    * Whether to allow the drawer to open completely, or to stay fixed at a maximum amount (with rubber banding when the user attempts to open it beyond this point)
+    */
+    'active'?: boolean;
+    /**
     * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
     */
     'cssClass'?: string | string[];
-    /**
-    * Whether the drawer is expanded.
-    */
-    'expanded'?: boolean;
     /**
     * The mode determines which platform styles to use.
     */
@@ -4172,6 +4176,10 @@ declare namespace LocalJSX {
     * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
     */
     'openHeight'?: number;
+    /**
+    * Whether the drawer is opened.
+    */
+    'opened'?: boolean;
     /**
     * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
     */
