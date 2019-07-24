@@ -277,26 +277,34 @@ export class Drawer implements ComponentInterface {
     console.log('End drag', detail, this.y, this.getOpenedY());
 
     let opened;
-    if (this.openHeight && this.y < this.getOpenedY()) {
-      this.slideOpen();
-      opened = true;
-    } else if (detail.velocityY < -0.6) {
-      this.slideOpen();
+
+    if (detail.velocityY < -0.6) {
+      // User threw the drawer up, open it
       opened = true;
     } else if (detail.velocityY > 0.6) {
-      this.slideClose();
+      // User threw the drawer down, close it
       opened = false;
+    } else if (this.openHeight && this.y <= this.getOpenedY()) {
+      // A max open height was set and was dragged at or above it
+      opened = true;
+    } else if (this.openHeight && this.y > this.getOpenedY()) {
+      // If they are just slightly under the max open height, don't close it,
+      // otherwise, close it
+      opened = this.y < (this.getOpenedY() + 75);
     } else if (this.y <= this.height / 2) {
-      this.slideOpen();
+      // If they dragged more than half the screen and the other conditions didn't hit,
+      // open it
       opened = true;
     } else {
-      this.slideClose();
+      // Otherwise, close it
       opened = false;
     }
 
     if (opened) {
+      this.slideOpen();
       this.fireOpen();
     } else {
+      this.slideClose();
       this.fireClose();
     }
   }
