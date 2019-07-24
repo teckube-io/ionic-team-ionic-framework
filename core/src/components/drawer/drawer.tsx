@@ -1,4 +1,4 @@
-import { Component, ComponentInterface, Element, Event, EventEmitter, Method, Prop, h, State, Watch } from '@stencil/core';
+import { Component, ComponentInterface, Element, Event, EventEmitter, Prop, h, State, Watch } from '@stencil/core';
 
 import { getIonMode } from '../../global/ionic-global';
 import { Animation } from '../../interface';
@@ -201,9 +201,11 @@ export class Drawer implements ComponentInterface {
 
     if (this.openHeight) {
       this.height = this.openHeight;
+      this.setContentHeight(this.openHeight);
     } else {
       const screenHeight = window.innerHeight;
       this.height = (screenHeight - this.topPadding);
+      this.setContentHeight(this.height);
     }
 
     e.style.height = `${this.height}px`;
@@ -215,6 +217,7 @@ export class Drawer implements ComponentInterface {
     while (n && n !== this.el) {
       if (n.tagName === 'ION-CONTENT') {
         if (this.scrollElement) {
+          console.log('Can start?', this.y, this.openHeight, this.maxOffset);
           // If the element is scrollable then we won't allow the drag. Add an extra pixel to the clientHeight
           // to account for an extra pixel in height in content (not sure why there's an extra pixel in content scroll but it's there)
           if (this.scrollElement.scrollHeight > this.scrollElement.clientHeight + 1) {
@@ -291,7 +294,7 @@ export class Drawer implements ComponentInterface {
       // If they are just slightly under the max open height, don't close it,
       // otherwise, close it
       opened = this.y < (this.getOpenedY() + 75);
-    } else if (this.y < (this.getOpenedY() + 75)) {
+    } else if (this.y > (this.getOpenedY() + 75)) {
       opened = false;
     } else if (this.y <= this.height / 2) {
       // If they dragged more than half the screen and the other conditions didn't hit,
@@ -304,10 +307,8 @@ export class Drawer implements ComponentInterface {
 
     if (opened) {
       this.slideOpen();
-      this.fireOpen();
     } else {
       this.slideClose();
-      this.fireClose();
     }
   }
 
@@ -319,15 +320,19 @@ export class Drawer implements ComponentInterface {
     this.el.style.transition = `${this.animationDuration}ms transform cubic-bezier(0.23, 1, 0.32, 1)`;
   }
 
+  private setContentHeight(height: number) {
+    if (this.shadowContentElement) {
+      this.shadowContentElement.style.height = `${height}px`;
+    }
+  }
+
   private growContentHeight(by: number) {
-    console.log('Grow content height', by);
     if (this.shadowContentElement) {
       if (this.openHeight) {
-        this.shadowContentElement.style.height = `${this.openHeight + by}px`;
+        this.setContentHeight(this.openHeight + by);
       } else {
         const screenHeight = window.innerHeight;
-        // this.contentHeight = (screenHeight - this.startOffset) + by;
-        this.shadowContentElement.style.height = `${(screenHeight - (this.startOffset || 0)) + by}px`;
+        this.setContentHeight(screenHeight - (this.startOffset || 0));
       }
     }
   }
@@ -347,6 +352,7 @@ export class Drawer implements ComponentInterface {
     // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
     this.slideTo(this.getOpenedY());
     this.afterTransition(() => {
+      this.fireOpen();
       this.growContentHeight(0);
     });
   }
@@ -357,8 +363,17 @@ export class Drawer implements ComponentInterface {
     const finalY = this.getClosedY();
     this.slideTo(finalY);
     this.afterTransition(() => {
+      this.fireClose();
       this.growContentHeight(0);
     });
+  }
+
+  private isOpen() {
+    return this.y === this.getOpenedY();
+  }
+
+  private isClosed() {
+    return this.y === this.getClosedY();
   }
 
   private afterTransition(fn: () => void) {
@@ -384,6 +399,8 @@ export class Drawer implements ComponentInterface {
   }
 
   private fireToggled(isOpened: boolean, _finalY: number) {
+    console.log('FIRE TOGGLED', isOpened);
+    console.trace();
     // this.menuToggle.emit(isExpanded);
     // this.onMenuToggled && this.onMenuToggled(isExpanded, finalY);
     if (isOpened) {
@@ -411,36 +428,11 @@ export class Drawer implements ComponentInterface {
 
   @Watch('opened')
   handleOpenedChange() {
-    if (this.opened) {
+    if (this.opened && !this.isOpen()) {
       this.slideOpen();
-      this.fireOpen();
-    } else {
+    } else if (!this.opened && !this.isClosed()) {
       this.slideClose();
-      this.fireClose();
     }
-  }
-
-  close = () => {
-    this.active = false;
-  }
-
-  toggle = (_e: MouseEvent) => {
-    const newOpened = !this.opened;
-
-    if (newOpened) {
-      this.fireOpen();
-    } else {
-      this.fireClose();
-    }
-  }
-
-  /**
-   * Present the action sheet overlay after it has been created.
-   */
-  @Method()
-  open(): Promise<void> {
-    this.fireOpen();
-    return Promise.resolve();
   }
 
   hostData() {

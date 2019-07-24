@@ -753,10 +753,6 @@ export namespace Components {
     */
     'mode'?: "ios" | "md";
     /**
-    * Present the action sheet overlay after it has been created.
-    */
-    'open': () => Promise<void>;
-    /**
     * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
     */
     'openHeight'?: number;

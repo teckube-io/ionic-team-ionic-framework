@@ -223,7 +223,6 @@ export class IonDrawer {
     proxyOutputs(this, this.el, ['ionDrawerDidOpen', 'ionDrawerWillOpen', 'ionDrawerDidClose', 'ionDrawerWillClose']);
   }
 }
-proxyMethods(IonDrawer, ['open']);
 proxyInputs(IonDrawer, ['cssClass', 'maxOffset', 'mode', 'openHeight', 'opened', 'startOffset']);
 
 export declare interface IonFab extends Components.IonFab {}
