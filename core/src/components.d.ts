@@ -741,13 +741,13 @@ export namespace Components {
   }
   interface IonDrawer {
     /**
-    * Whether to allow the drawer to open completely, or to stay fixed at a maximum amount (with rubber banding when the user attempts to open it beyond this point)
-    */
-    'active': boolean;
-    /**
     * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
     */
     'cssClass'?: string | string[];
+    /**
+    * The max position to allow the user to open the drawer to. Set this value equal to the open height in order to prevent the user from opening the drawer fully.  Once this limit is reached, the drawer will rubber band slightly beyond it.
+    */
+    'maxOffset'?: number;
     /**
     * The mode determines which platform styles to use.
     */
@@ -4145,13 +4145,13 @@ declare namespace LocalJSX {
   }
   interface IonDrawer extends JSXBase.HTMLAttributes<HTMLIonDrawerElement> {
     /**
-    * Whether to allow the drawer to open completely, or to stay fixed at a maximum amount (with rubber banding when the user attempts to open it beyond this point)
-    */
-    'active'?: boolean;
-    /**
     * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
     */
     'cssClass'?: string | string[];
+    /**
+    * The max position to allow the user to open the drawer to. Set this value equal to the open height in order to prevent the user from opening the drawer fully.  Once this limit is reached, the drawer will rubber band slightly beyond it.
+    */
+    'maxOffset'?: number;
     /**
     * The mode determines which platform styles to use.
     */

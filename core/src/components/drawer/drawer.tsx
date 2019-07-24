@@ -38,6 +38,8 @@ export class Drawer implements ComponentInterface {
   lastY = 0;
   gesture?: Gesture;
   scrollElement?: HTMLElement;
+  shadowContentElement?: HTMLElement;
+  contentHeight = 0;
   // Whether the drawer will scroll based on the content height
   canScroll = false;
 
@@ -61,9 +63,12 @@ export class Drawer implements ComponentInterface {
   @Prop() openHeight?: number;
 
   /**
-   * Whether to allow the drawer to open completely, or to stay fixed at a maximum amount (with rubber banding when the user attempts to open it beyond this point)
+   * The max position to allow the user to open the drawer to. Set this value equal to the
+   * open height in order to prevent the user from opening the drawer fully.
+   *
+   * Once this limit is reached, the drawer will rubber band slightly beyond it.
    */
-  @Prop()
+  @Prop() maxOffset?: number;
 
   @State() active = false;
 
@@ -145,6 +150,8 @@ export class Drawer implements ComponentInterface {
 
     this.gesture.setDisabled(false);
 
+    this.shadowContentElement = this.el.shadowRoot!.querySelector('.drawer-slotted-content') as HTMLElement;
+
     // Grab the main scroll region in the provided content which will be used
     // to handle the drag detection and block dragging when the user intends
     // to scroll the content instead
@@ -189,6 +196,7 @@ export class Drawer implements ComponentInterface {
   private sizeElement() {
     const e = this.el;
 
+    console.log('Sizing element', this.y);
     // this.contentHeight = screenHeight - this.startOffset;
 
     if (this.openHeight) {
@@ -226,9 +234,29 @@ export class Drawer implements ComponentInterface {
 
   private onGestureMove = (detail: GestureDetail) => {
     const dy = this.lastY ? detail.currentY - this.lastY : 0;
-    if (this.y <= this.topPadding) {
+
+    const openedY = this.getOpenedY();
+
+    console.log(this.openHeight, this.y < openedY);
+
+    let isBeyond = false;
+    if (this.openHeight && this.y < openedY || (this.maxOffset && openedY < this.maxOffset)) {
+      isBeyond = true;
+    } else if (this.y <= this.topPadding) {
+      isBeyond = true;
+    }
+
+    // Check if the user has dragged beyond our limit
+    if (isBeyond) {
       // Grow the content area slightly
-      this.growContentHeight(this.topPadding - this.y);
+      // const screenHeight = window.innerHeight;
+
+      const openY = this.getOpenedY();
+      const overAmount = openY - this.y;
+
+      console.log('Over amount', overAmount);
+
+      this.growContentHeight(overAmount);
       // When we're above the limit, let the user pull but at a
       // slower rate (to give a sense of friction)
       this.slideBy(dy * 0.3);
@@ -246,8 +274,13 @@ export class Drawer implements ComponentInterface {
 
     this.lastY = 0;
 
+    console.log('End drag', detail, this.y, this.getOpenedY());
+
     let opened;
-    if (detail.velocityY < -0.6) {
+    if (this.openHeight && this.y < this.getOpenedY()) {
+      this.slideOpen();
+      opened = true;
+    } else if (detail.velocityY < -0.6) {
       this.slideOpen();
       opened = true;
     } else if (detail.velocityY > 0.6) {
@@ -276,9 +309,17 @@ export class Drawer implements ComponentInterface {
     this.el.style.transition = `${this.animationDuration}ms transform cubic-bezier(0.23, 1, 0.32, 1)`;
   }
 
-  private growContentHeight(_by: number) {
-    // const screenHeight = window.innerHeight;
-    // this.contentHeight = (screenHeight - this.startOffset) + by;
+  private growContentHeight(by: number) {
+    console.log('Grow content height', by);
+    if (this.shadowContentElement) {
+      if (this.openHeight) {
+        this.shadowContentElement.style.height = `${this.openHeight + by}px`;
+      } else {
+        const screenHeight = window.innerHeight;
+        // this.contentHeight = (screenHeight - this.startOffset) + by;
+        this.shadowContentElement.style.height = `${(screenHeight - (this.startOffset || 0)) + by}px`;
+      }
+    }
   }
 
   private slideBy(dy: number) {
@@ -303,7 +344,7 @@ export class Drawer implements ComponentInterface {
   private slideClose() {
     console.log('Sliding close');
     // const startY = this.y;
-    const finalY = this.getCollapsedY();
+    const finalY = this.getClosedY();
     this.slideTo(finalY);
     this.afterTransition(() => {
       this.growContentHeight(0);
@@ -323,7 +364,7 @@ export class Drawer implements ComponentInterface {
     }
   }
 
-  private getCollapsedY() {
+  private getClosedY() {
     const screenHeight = window.innerHeight;
     if (this.startOffset) {
       return screenHeight - this.startOffset;
@@ -332,10 +373,10 @@ export class Drawer implements ComponentInterface {
     return screenHeight + 20;
   }
 
-  private fireToggled(isExpanded: boolean, _finalY: number) {
+  private fireToggled(isOpened: boolean, _finalY: number) {
     // this.menuToggle.emit(isExpanded);
     // this.onMenuToggled && this.onMenuToggled(isExpanded, finalY);
-    if (isExpanded) {
+    if (isOpened) {
       this.willOpen.emit();
       setTimeout(() => {
         this.didOpen.emit();
@@ -355,7 +396,7 @@ export class Drawer implements ComponentInterface {
   }
 
   private fireClose() {
-    this.fireToggled(false, this.getCollapsedY());
+    this.fireToggled(false, this.getClosedY());
   }
 
   @Watch('opened')
