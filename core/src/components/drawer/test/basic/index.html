@@ -17,7 +17,7 @@
   <ion-button onclick="showDrawer()">Show</ion-button>
   <ion-button onclick="closeDrawer()">Close</ion-button>
 
-  <ion-drawer id="drawer" open-height="300">
+  <ion-drawer id="drawer" partially-open-height="300">
   </ion-drawer>
   <!--
   <ion-drawer id="drawer">
@@ -26,19 +26,19 @@
   <script>
     function showDrawer() {
       const drawer = document.querySelector('ion-drawer');
-      drawer.opened = true;
+      drawer.state = 'partial';
     }
 
     function closeDrawer() {
       const drawer = document.querySelector('ion-drawer');
       console.log('Closing drawer');
-      drawer.opened = false;
+      drawer.state = 'closed';
     }
 
     const drawer = document.querySelector('#drawer');
     drawer.addEventListener('ionDrawerClose', (e) => {
       console.log('Drawer closed!', e);
-      drawer.opened = false;
+      drawer.state = 'closed';
     });
 
     drawer.innerHTML = `
@@ -66,6 +66,86 @@
           </ion-avatar>
           <ion-label>
             mars.nasa.gov
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
+          </ion-label>
+        </ion-item>
+        <ion-item detail>
+          <ion-avatar slot="start">
+            <ion-icon name="md-create" />
+          </ion-avatar>
+          <ion-label>
+            Suggest an edit
           </ion-label>
         </ion-item>
         <ion-item detail>

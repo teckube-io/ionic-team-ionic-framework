@@ -756,15 +756,19 @@ export namespace Components {
     * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
     */
     'openHeight'?: number;
-    /**
-    * Whether the drawer is opened.
-    */
-    'opened': boolean;
     'overlayIndex': number;
+    /**
+    * The height of the element when partially opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    */
+    'partiallyOpenHeight'?: number;
     /**
     * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
     */
     'startOffset'?: number;
+    /**
+    * Whether the drawer is opened.
+    */
+    'state': 'open' | 'partial' | 'closed';
   }
   interface IonFab {
     /**
@@ -4165,13 +4169,17 @@ declare namespace LocalJSX {
     */
     'openHeight'?: number;
     /**
-    * Whether the drawer is opened.
+    * The height of the element when partially opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
     */
-    'opened'?: boolean;
+    'partiallyOpenHeight'?: number;
     /**
     * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
     */
     'startOffset'?: number;
+    /**
+    * Whether the drawer is opened.
+    */
+    'state'?: 'open' | 'partial' | 'closed';
   }
   interface IonFab extends JSXBase.HTMLAttributes<HTMLIonFabElement> {
     /**

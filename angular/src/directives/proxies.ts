@@ -210,7 +210,7 @@ proxyMethods(IonDatetime, ['open']);
 proxyInputs(IonDatetime, ['cancelText', 'dayNames', 'dayShortNames', 'dayValues', 'disabled', 'displayFormat', 'doneText', 'hourValues', 'max', 'min', 'minuteValues', 'mode', 'monthNames', 'monthShortNames', 'monthValues', 'name', 'pickerFormat', 'pickerOptions', 'placeholder', 'readonly', 'value', 'yearValues']);
 
 export declare interface IonDrawer extends Components.IonDrawer {}
-@Component({ selector: 'ion-drawer', changeDetection: ChangeDetectionStrategy.OnPush, template: '<ng-content></ng-content>', inputs: ['cssClass', 'maxOffset', 'mode', 'openHeight', 'opened', 'startOffset'] })
+@Component({ selector: 'ion-drawer', changeDetection: ChangeDetectionStrategy.OnPush, template: '<ng-content></ng-content>', inputs: ['cssClass', 'maxOffset', 'mode', 'openHeight', 'partiallyOpenHeight', 'startOffset', 'state'] })
 export class IonDrawer {
   ionDrawerOpen!: EventEmitter<CustomEvent>;
   ionDrawerClose!: EventEmitter<CustomEvent>;
@@ -221,7 +221,7 @@ export class IonDrawer {
     proxyOutputs(this, this.el, ['ionDrawerOpen', 'ionDrawerClose']);
   }
 }
-proxyInputs(IonDrawer, ['cssClass', 'maxOffset', 'mode', 'openHeight', 'opened', 'startOffset']);
+proxyInputs(IonDrawer, ['cssClass', 'maxOffset', 'mode', 'openHeight', 'partiallyOpenHeight', 'startOffset', 'state']);
 
 export declare interface IonFab extends Components.IonFab {}
 @Component({ selector: 'ion-fab', changeDetection: ChangeDetectionStrategy.OnPush, template: '<ng-content></ng-content>', inputs: ['activated', 'edge', 'horizontal', 'vertical'] })
