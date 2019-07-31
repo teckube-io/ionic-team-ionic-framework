@@ -753,22 +753,22 @@ export namespace Components {
     */
     'mode'?: "ios" | "md";
     /**
-    * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    * The height of the element when fully. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
     */
-    'openHeight'?: number;
-    'overlayIndex': number;
+    'openHeightEnd'?: number;
     /**
-    * The height of the element when partially opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    * The height of the element when partially opened. If not set the middle position will not be used
     */
-    'partiallyOpenHeight'?: number;
+    'openHeightMiddle'?: number;
     /**
-    * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
+    * The height of the element when in its starting position
     */
-    'startOffset'?: number;
+    'openHeightStart'?: number;
     /**
     * Whether the drawer is opened.
     */
-    'state': 'open' | 'partial' | 'closed';
+    'openTo': 'start' | 'middle' | 'end' | 'closed';
+    'overlayIndex': number;
   }
   interface IonFab {
     /**
@@ -4165,21 +4165,21 @@ declare namespace LocalJSX {
     */
     'onIonDrawerOpen'?: (event: CustomEvent<void>) => void;
     /**
-    * The height of the element when opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    * The height of the element when fully. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
     */
-    'openHeight'?: number;
+    'openHeightEnd'?: number;
     /**
-    * The height of the element when partially opened. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    * The height of the element when partially opened. If not set the middle position will not be used
     */
-    'partiallyOpenHeight'?: number;
+    'openHeightMiddle'?: number;
     /**
-    * The starting position of the drawer, from the bottom of the screen. If not set, the drawer will not be visible until it is shown
+    * The height of the element when in its starting position
     */
-    'startOffset'?: number;
+    'openHeightStart'?: number;
     /**
     * Whether the drawer is opened.
     */
-    'state'?: 'open' | 'partial' | 'closed';
+    'openTo'?: 'start' | 'middle' | 'end' | 'closed';
   }
   interface IonFab extends JSXBase.HTMLAttributes<HTMLIonFabElement> {
     /**

@@ -48,25 +48,23 @@ export class Drawer implements ComponentInterface {
   /**
    * Whether the drawer is opened.
    */
-  @Prop() state: 'open' | 'partial' | 'closed' = 'closed';
+  @Prop() openTo: 'start' | 'middle' | 'end' | 'closed' = 'closed';
 
   /**
-   * The starting position of the drawer, from the bottom of the screen. If not set,
-   * the drawer will not be visible until it is shown
+   * The height of the element when in its starting position
    */
-  @Prop() startOffset?: number;
+  @Prop() openHeightStart?: number;
 
   /**
-   * The height of the element when opened. If not set, the height will be computed
+   * The height of the element when partially opened. If not set the middle position will not be used
+   */
+  @Prop() openHeightMiddle?: number;
+
+  /**
+   * The height of the element when fully. If not set, the height will be computed
    * and set to the height of the screen minus some padding for any top notch
    */
-  @Prop() openHeight?: number;
-
-  /**
-   * The height of the element when partially opened. If not set, the height will be computed
-   * and set to the height of the screen minus some padding for any top notch
-   */
-  @Prop() partiallyOpenHeight?: number;
+  @Prop() openHeightEnd?: number;
 
   /**
    * The max position to allow the user to open the drawer to. Set this value equal to the
@@ -106,7 +104,11 @@ export class Drawer implements ComponentInterface {
     }
 
     // Set the starting Y position
-    this.y = this.startOffset ? screenHeight - this.startOffset : screenHeight + 20;
+    const startingY = this.openTo !== 'closed' ? this.openHeightStart || this.openHeightMiddle : 0;
+
+    console.log('Starting Y', startingY);
+
+    this.y = startingY ? screenHeight - startingY : screenHeight + 20;
 
     this.sizeElement();
     this.slideTo(this.y);
@@ -156,16 +158,6 @@ export class Drawer implements ComponentInterface {
       this.scrollElement = await contentEl.getScrollElement();
     }
 
-    const contentHeight = contentEl.getBoundingClientRect().height;
-
-    // If the user provided an open height that is more than the non-zero height of the
-    // content, then clip the max open height to the height of the content
-    if (this.openHeight && contentHeight > 0 && contentHeight < this.openHeight) {
-      console.log('Clipping open height to', contentHeight);
-      this.openHeight = contentHeight;
-    }
-    console.log(this.openHeight, contentHeight);
-
     this.sizeElement();
 
     this.slideTo(this.y);
@@ -175,7 +167,7 @@ export class Drawer implements ComponentInterface {
   // From https://stackoverflow.com/a/48572849
   private hasNotch() {
     if (CSS.supports('padding-bottom: env(safe-area-inset-bottom)')) {
-      let div = document.createElement('div');
+      const div = document.createElement('div');
       div.style.paddingBottom = 'env(safe-area-inset-bottom)';
       document.body.appendChild(div);
       const paddingBottomStyle = window.getComputedStyle(div).paddingBottom;
@@ -192,15 +184,10 @@ export class Drawer implements ComponentInterface {
   private sizeElement() {
     const e = this.el;
 
-    console.log('Sizing element', this.y);
-    // this.contentHeight = screenHeight - this.startOffset;
-
-    if (this.partiallyOpenHeight) {
-      this.height = this.partiallyOpenHeight;
-      this.setContentHeight(this.partiallyOpenHeight);
-    } else if (this.openHeight) {
-      this.height = this.openHeight;
-      this.setContentHeight(this.openHeight);
+    // Size the content area, either by using the max height or by using the full screen height
+    if (this.openHeightEnd) {
+      this.height = this.openHeightEnd;
+      this.setContentHeight(this.openHeightEnd);
     } else {
       const screenHeight = window.innerHeight;
       this.height = (screenHeight - this.topPadding);
@@ -216,10 +203,10 @@ export class Drawer implements ComponentInterface {
     while (n && n !== this.el) {
       if (n.tagName === 'ION-CONTENT') {
         if (this.scrollElement) {
-          console.log('Can start?', this.y, this.partiallyOpenHeight, this.openHeight, this.maxOffset);
+          console.log('Can start?', this.y, this.openHeightMiddle, this.openHeightEnd, this.maxOffset);
           // If the element is scrollable then we won't allow the drag. Add an extra pixel to the clientHeight
           // to account for an extra pixel in height in content (not sure why there's an extra pixel in content scroll but it's there)
-          const canOpen = !this.maxOffset || (this.partiallyOpenHeight && this.partiallyOpenHeight < this.maxOffset);
+          const canOpen = !this.maxOffset || (this.openHeightMiddle && this.openHeightMiddle < this.maxOffset);
           if (!canOpen && this.scrollElement.scrollHeight > this.scrollElement.clientHeight + 1) {
             return false;
           }
@@ -238,12 +225,12 @@ export class Drawer implements ComponentInterface {
   private onGestureMove = (detail: GestureDetail) => {
     const dy = this.lastY ? detail.currentY - this.lastY : 0;
 
-    const openedY = this.getOpenedY();
+    const openedY = this.getOpenEndY();
 
-    console.log(this.openHeight, this.y < openedY);
+    console.log(this.openHeightEnd, this.y < openedY);
 
     let isBeyond = false;
-    if (this.openHeight && this.maxOffset && this.y < openedY || (this.maxOffset && openedY < this.maxOffset)) {
+    if (this.openHeightEnd && this.maxOffset && this.y < openedY || (this.maxOffset && openedY < this.maxOffset)) {
       isBeyond = true;
     } else if (this.y <= this.topPadding) {
       isBeyond = true;
@@ -254,7 +241,7 @@ export class Drawer implements ComponentInterface {
       // Grow the content area slightly
       // const screenHeight = window.innerHeight;
 
-      const openY = this.getOpenedY();
+      const openY = this.getOpenEndY();
       const overAmount = openY - this.y;
 
       console.log('Over amount', overAmount);
@@ -277,7 +264,7 @@ export class Drawer implements ComponentInterface {
 
     this.lastY = 0;
 
-    console.log('End drag', detail, this.y, this.getOpenedY());
+    console.log('End drag', detail, this.y, this.getOpenEndY());
 
     let opened;
 
@@ -287,16 +274,16 @@ export class Drawer implements ComponentInterface {
     } else if (detail.velocityY > 0.6) {
       // User threw the drawer down, close it
       opened = false;
-    } else if (this.partiallyOpenHeight && this.y <= this.getPartiallyOpenedY()) {
+    } else if (this.openHeightMiddle && this.y <= this.getOpenMiddleY()) {
       opened = true;
-    } else if (this.openHeight && this.y <= this.getOpenedY()) {
+    } else if (this.openHeightEnd && this.y <= this.getOpenEndY()) {
       // A max open height was set and was dragged at or above it
       opened = true;
-    } else if (this.openHeight && this.y > this.getOpenedY()) {
+    } else if (this.openHeightEnd && this.y > this.getOpenEndY()) {
       // If they are just slightly under the max open height, don't close it,
       // otherwise, close it
-      opened = this.y < (this.getOpenedY() + 75);
-    } else if (this.y > (this.getOpenedY() + 75)) {
+      opened = this.y < (this.getOpenEndY() + 75);
+    } else if (this.y > (this.getOpenEndY() + 75)) {
       opened = false;
     } else if (this.y <= this.height / 2) {
       // If they dragged more than half the screen and the other conditions didn't hit,
@@ -308,7 +295,7 @@ export class Drawer implements ComponentInterface {
     }
 
     if (opened) {
-      this.slideOpen();
+      this.slideOpenToEnd();
     } else {
       this.slideClose();
     }
@@ -330,13 +317,11 @@ export class Drawer implements ComponentInterface {
 
   private growContentHeight(by: number) {
     if (this.shadowContentElement) {
-      if (this.partiallyOpenHeight && this.state === 'partial') {
-        this.setContentHeight(this.partiallyOpenHeight + by);
-      } else if (this.openHeight) {
-        this.setContentHeight(this.openHeight + by);
+      if (this.openHeightEnd) {
+        this.setContentHeight(this.openHeightEnd + by);
       } else {
         const screenHeight = window.innerHeight;
-        this.setContentHeight(screenHeight - (this.startOffset || 0));
+        this.setContentHeight(screenHeight + by);
       }
     }
   }
@@ -350,25 +335,37 @@ export class Drawer implements ComponentInterface {
     this.el.style.transform = `translateY(${this.y}px) translateZ(0)`;
   }
 
-  private slideOpen() {
+  private slideOpenToEnd() {
     // const startY = this.y;
     // const screenHeight = window.innerHeight;
     // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
-    this.slideTo(this.getOpenedY());
+    this.slideTo(this.getOpenEndY());
     this.afterTransition(() => {
       this.fireOpen();
       this.growContentHeight(0);
     });
   }
 
-  private slideOpenPartially() {
-    console.log('Openining partially', this.getPartiallyOpenedY());
+  private slideOpenToMiddle() {
+    console.log('Openining partially', this.getOpenMiddleY());
     // const startY = this.y;
     // const screenHeight = window.innerHeight;
     // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
-    this.slideTo(this.getPartiallyOpenedY());
+    this.slideTo(this.getOpenMiddleY());
     this.afterTransition(() => {
-      this.firePartiallyOpen();
+      this.fireOpenToMiddle();
+      this.growContentHeight(0);
+    });
+  }
+
+  private slideOpenToStart() {
+    console.log('Openining to start', this.getOpenStartY());
+    // const startY = this.y;
+    // const screenHeight = window.innerHeight;
+    // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
+    this.slideTo(this.getOpenStartY());
+    this.afterTransition(() => {
+      this.fireOpenToStart();
       this.growContentHeight(0);
     });
   }
@@ -384,12 +381,16 @@ export class Drawer implements ComponentInterface {
     });
   }
 
-  private isOpen() {
-    return this.y === this.getOpenedY();
+  private isOpenToEnd() {
+    return this.y === this.getOpenEndY();
   }
 
-  private isOpenPartially() {
-    return this.y === this.getPartiallyOpenedY();
+  private isOpenToMiddle() {
+    return this.y === this.getOpenMiddleY();
+  }
+
+  private isOpenToStart() {
+    return this.y === this.getOpenStartY();
   }
 
   private isClosed() {
@@ -400,19 +401,28 @@ export class Drawer implements ComponentInterface {
     setTimeout(fn, this.animationDuration);
   }
 
-  private getOpenedY() {
-    if (this.openHeight) {
+  private getOpenEndY() {
+    if (this.openHeightEnd) {
       const screenHeight = window.innerHeight;
-      return screenHeight - this.openHeight;
+      return screenHeight - this.openHeightEnd;
     } else {
       return this.topPadding;
     }
   }
 
-  private getPartiallyOpenedY() {
-    if (this.partiallyOpenHeight) {
+  private getOpenMiddleY() {
+    if (this.openHeightMiddle) {
       const screenHeight = window.innerHeight;
-      return screenHeight - this.partiallyOpenHeight;
+      return screenHeight - this.openHeightMiddle;
+    } else {
+      return this.topPadding;
+    }
+  }
+
+  private getOpenStartY() {
+    if (this.openHeightStart) {
+      const screenHeight = window.innerHeight;
+      return screenHeight - this.openHeightStart;
     } else {
       return this.topPadding;
     }
@@ -420,9 +430,6 @@ export class Drawer implements ComponentInterface {
 
   private getClosedY() {
     const screenHeight = window.innerHeight;
-    if (this.startOffset) {
-      return screenHeight - this.startOffset;
-    }
 
     return screenHeight + 20;
   }
@@ -436,24 +443,30 @@ export class Drawer implements ComponentInterface {
   }
 
   private fireOpen() {
-    this.fireToggled(true, this.getOpenedY());
+    this.fireToggled(true, this.getOpenEndY());
   }
 
-  private firePartiallyOpen() {
-    this.fireToggled(true, this.getPartiallyOpenedY());
+  private fireOpenToMiddle() {
+    this.fireToggled(true, this.getOpenMiddleY());
+  }
+
+  private fireOpenToStart() {
+    this.fireToggled(true, this.getOpenStartY());
   }
 
   private fireClose() {
     this.fireToggled(false, this.getClosedY());
   }
 
-  @Watch('state')
+  @Watch('openTo')
   handleOpenedChange() {
-    if (this.state === 'open' && !this.isOpen()) {
-      this.slideOpen();
-    } else if (this.state === 'partial' && !this.isOpenPartially()) {
-      this.slideOpenPartially();
-    } else if (this.state === 'closed' && !this.isClosed()) {
+    if (this.openTo === 'end' && !this.isOpenToEnd()) {
+      this.slideOpenToEnd();
+    } else if (this.openTo === 'middle' && !this.isOpenToMiddle()) {
+      this.slideOpenToMiddle();
+    } else if (this.openTo === 'start' && !this.isOpenToStart()) {
+      this.slideOpenToStart();
+    } else if (this.openTo === 'closed' && !this.isClosed()) {
       this.slideClose();
     }
   }
