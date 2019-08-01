@@ -428,9 +428,9 @@ export class Drawer implements ComponentInterface {
   */
 
   private slideClose() {
-    console.log('Sliding close');
     // const startY = this.y;
     const finalY = this.getClosedY();
+    console.log('Sliding close', finalY);
     this.slideTo(finalY);
     this.afterTransition(() => {
       this.fireClose();
@@ -483,26 +483,19 @@ export class Drawer implements ComponentInterface {
   @Watch('snapTo')
   handleOpenedChange() {
     let point;
-    if (this.snapTo === -1) {
-      point = this.points[this.points.length - 1];
-    } else {
-      point = this.points[this.snapTo];
-    }
 
-    console.log('Sliding to', point, this.snapTo);
-
-    this.slideTo(point);
-    /*
-    if (this.openTo === 'end' && !this.isOpenToEnd()) {
-      this.slideOpenToEnd();
-    } else if (this.openTo === 'middle' && !this.isOpenToMiddle()) {
-      this.slideOpenToMiddle();
-    } else if (this.openTo === 'start' && !this.isOpenToStart()) {
-      this.slideOpenToStart();
-    } else if (this.openTo === 'closed' && !this.isClosed()) {
+    if (!this.snapTo) {
       this.slideClose();
+    } else {
+
+      if (this.snapTo === -1) {
+        point = this.points[this.points.length - 1];
+      } else {
+        point = this.points[this.snapTo];
+      }
+
+      this.slideTo(point);
     }
-    */
   }
 
   hostData() {
