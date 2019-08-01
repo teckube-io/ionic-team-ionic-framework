@@ -741,11 +741,15 @@ export namespace Components {
   }
   interface IonDrawer {
     /**
+    * Whether the drawer can be closed. If set to false, the preview offset value is used. If the preview offset value is not used a warning will be printed.
+    */
+    'canClose': boolean;
+    /**
     * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
     */
     'cssClass'?: string | string[];
     /**
-    * The max position to allow the user to open the drawer to. If this value is not set the drawer will open the full height of the screen.  Once this limit is reached, the drawer will rubber band slightly beyond it.
+    * The max position to allow the user to open the drawer to. If this value is not set the drawer will open the full height of the screen.  Once this limit is reached, the drawer will rubber band slightly beyond it.  Values are relative to the main axis of the drawer. See `snapTo` above for more information.
     */
     'maxOffset'?: number;
     /**
@@ -754,13 +758,17 @@ export namespace Components {
     'mode'?: "ios" | "md";
     'overlayIndex': number;
     /**
-    * The amount to show as a preview. If this is not set the drawer will start closed.
+    * The amount to show as a preview. If this is not set the drawer will start closed. Values are relative to the main axis of the drawer. See `snapTo` above for more information.
     */
     'previewOffset': number;
     /**
-    * Whether the drawer is opened.
+    * A string containing a list of offsets to snap the drawer to. Offsets are specified relative to the main drawer axis. For example, the bottom drawer values are all relative to the bottom of the viewport, so "100" corresponds to an approximate position of `viewportHeight - 100`.
     */
-    'snapPoints': string;
+    'snapOffsets': string;
+    /**
+    * Set the current open position to the offset at the given index.  The index corresponds to an array containing the following offsets:  [previewOffset, ...snapTo, maxOffset]  To close the drawer, unset this value. To open the drawer fully, set this value to -1, which corresponds to the last item in the above array, i.e. maxOffset
+    */
+    'snapTo': number;
   }
   interface IonFab {
     /**
@@ -4137,11 +4145,15 @@ declare namespace LocalJSX {
   }
   interface IonDrawer extends JSXBase.HTMLAttributes<HTMLIonDrawerElement> {
     /**
+    * Whether the drawer can be closed. If set to false, the preview offset value is used. If the preview offset value is not used a warning will be printed.
+    */
+    'canClose'?: boolean;
+    /**
     * Additional classes to apply for custom CSS. If multiple classes are provided they should be separated by spaces.
     */
     'cssClass'?: string | string[];
     /**
-    * The max position to allow the user to open the drawer to. If this value is not set the drawer will open the full height of the screen.  Once this limit is reached, the drawer will rubber band slightly beyond it.
+    * The max position to allow the user to open the drawer to. If this value is not set the drawer will open the full height of the screen.  Once this limit is reached, the drawer will rubber band slightly beyond it.  Values are relative to the main axis of the drawer. See `snapTo` above for more information.
     */
     'maxOffset'?: number;
     /**
@@ -4157,13 +4169,17 @@ declare namespace LocalJSX {
     */
     'onIonDrawerOpen'?: (event: CustomEvent<void>) => void;
     /**
-    * The amount to show as a preview. If this is not set the drawer will start closed.
+    * The amount to show as a preview. If this is not set the drawer will start closed. Values are relative to the main axis of the drawer. See `snapTo` above for more information.
     */
     'previewOffset'?: number;
     /**
-    * Whether the drawer is opened.
+    * A string containing a list of offsets to snap the drawer to. Offsets are specified relative to the main drawer axis. For example, the bottom drawer values are all relative to the bottom of the viewport, so "100" corresponds to an approximate position of `viewportHeight - 100`.
     */
-    'snapPoints'?: string;
+    'snapOffsets'?: string;
+    /**
+    * Set the current open position to the offset at the given index.  The index corresponds to an array containing the following offsets:  [previewOffset, ...snapTo, maxOffset]  To close the drawer, unset this value. To open the drawer fully, set this value to -1, which corresponds to the last item in the above array, i.e. maxOffset
+    */
+    'snapTo'?: number;
   }
   interface IonFab extends JSXBase.HTMLAttributes<HTMLIonFabElement> {
     /**

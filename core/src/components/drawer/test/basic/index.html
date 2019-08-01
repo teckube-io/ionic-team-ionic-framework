@@ -14,10 +14,12 @@
 <body class="ion-padding">
   <h1>Default</h1>
 
-  <ion-button onclick="showDrawer('start')">Start</ion-button>
-  <ion-button onclick="showDrawer('middle')">Middle</ion-button>
-  <ion-button onclick="showDrawer('end')">End</ion-button>
+  <ion-button onclick="showDrawer(0)">Start (0)</ion-button>
+  <ion-button onclick="showDrawer(1)">1</ion-button>
+  <ion-button onclick="showDrawer(2)">2</ion-button>
+  <ion-button onclick="showDrawer(-1)">End (-1)</ion-button>
   <ion-button onclick="closeDrawer()">Close</ion-button>
+  <ion-button onclick="openDrawer()">Open</ion-button>
 
   <!--
   <ion-drawer id="drawer" partially-open-height="300">
@@ -25,25 +27,31 @@
   <ion-drawer id="drawer">
   </ion-drawer>
   -->
-  <ion-drawer id="drawer" snap-points="200" preview-offset="100">
+  <ion-drawer id="drawer" snap-offsets="200,300" preview-offset="100" can-close="false">
   </ion-drawer>
 
   <script>
     function showDrawer(where) {
       const drawer = document.querySelector('ion-drawer');
-      drawer.openTo = where;
+      drawer.snapTo = where;
     }
 
     function closeDrawer() {
       const drawer = document.querySelector('ion-drawer');
       console.log('Closing drawer');
-      drawer.openTo = 'closed';
+      drawer.snapTo = null;
+    }
+
+    function openDrawer() {
+      const drawer = document.querySelector('ion-drawer');
+      console.log('Closing drawer');
+      drawer.snapTo = -1;
     }
 
     const drawer = document.querySelector('#drawer');
     drawer.addEventListener('ionDrawerClose', (e) => {
       console.log('Drawer closed!', e);
-      drawer.openTo = 'closed';
+      drawer.snapTo = null;
     });
 
     drawer.innerHTML = `

@@ -1,4 +1,4 @@
-import { Component, ComponentInterface, Element, Event, EventEmitter, Prop, h, State, Watch } from '@stencil/core';
+import { Component, ComponentInterface, Element, Event, EventEmitter, Prop, h, Watch } from '@stencil/core';
 
 import { getIonMode } from '../../global/ionic-global';
 import { Animation } from '../../interface';
@@ -24,7 +24,6 @@ import { mdLeaveAnimation } from './animations/md.leave';
   shadow: true
 })
 export class Drawer implements ComponentInterface {
-
   presented = false;
   animation?: Animation;
   mode = getIonMode(this);
@@ -53,13 +52,29 @@ export class Drawer implements ComponentInterface {
   @Element() el!: HTMLElement;
 
   /**
-   * Whether the drawer is opened.
+   * Set the current open position to the offset at the given index.
+   * 
+   * The index corresponds to an array containing the following offsets:
+   * 
+   * [previewOffset, ...snapTo, maxOffset]
+   * 
+   * To close the drawer, unset this value. To open the drawer fully, set this
+   * value to -1, which corresponds to the last item in the above array, i.e. maxOffset
    */
-  @Prop() snapPoints = '';
+  @Prop() snapTo = 0;
+
+  /**
+   * A string containing a list of offsets to snap the drawer to. Offsets
+   * are specified relative to the main drawer axis. For example, the bottom
+   * drawer values are all relative to the bottom of the viewport, so "100" corresponds
+   * to an approximate position of `viewportHeight - 100`.
+   */
+  @Prop() snapOffsets = '';
 
   /**
    * The amount to show as a preview. If this is not set the
-   * drawer will start closed.
+   * drawer will start closed. Values are relative to the main axis of the
+   * drawer. See `snapTo` above for more information.
    */
   @Prop() previewOffset = 0;
 
@@ -68,10 +83,17 @@ export class Drawer implements ComponentInterface {
    * not set the drawer will open the full height of the screen.
    *
    * Once this limit is reached, the drawer will rubber band slightly beyond it.
+   * 
+   * Values are relative to the main axis of the drawer. See `snapTo` above
+   * for more information.
    */
   @Prop() maxOffset?: number;
 
-  @State() active = false;
+  /**
+   * Whether the drawer can be closed. If set to false, the preview offset value
+   * is used. If the preview offset value is not used a warning will be printed.
+   */
+  @Prop({ mutable: true }) canClose: boolean = true;
 
   /** @internal */
   @Prop() overlayIndex!: number;
@@ -101,6 +123,11 @@ export class Drawer implements ComponentInterface {
     this.minY = this.getMinY();
 
     console.log('Got snap points', this.points);
+
+    if (!this.canClose && !this.previewOffset) {
+      console.warn('Drawer canClose set to false but no previewOffset provided! Drawer will close to avoid undefined behavior');
+      this.canClose = true;
+    }
 
     if (this.hasNotch()) {
       // Add more padding at the top for the notch
@@ -168,8 +195,8 @@ export class Drawer implements ComponentInterface {
   }
 
   private getAllPoints() {
-    const snapPoints = this.snapPoints ?
-      this.snapPoints.split(/[ ,]+/).map(x => this.getYForPoint(parseInt(x, 10)))
+    const snapPoints = this.snapOffsets ?
+      this.snapOffsets.split(/[ ,]+/).map(x => this.getYForPoint(parseInt(x, 10)))
         : [];
     return [this.getMinY(), ...snapPoints, this.getMaxY()];
   }
@@ -294,17 +321,24 @@ export class Drawer implements ComponentInterface {
 
     this.lastY = 0;
 
-    console.log('End drag', detail, this.y, this.getMaxY());
+    const nearestPoint = this.points.find(point => {
+      return point < this.y
+    });
 
-    let opened;
+    console.log('End drag', detail, this.y, this.points, nearestPoint);
+
 
     if (detail.velocityY < -0.6) {
+      console.log('Sliding open due to velocity');
       // User threw the drawer up, open it
-      opened = true;
+      this.slideOpen();
     } else if (detail.velocityY > 0.6) {
       // User threw the drawer down, close it
-      opened = false;
-    } 
+      this.slideClose();
+    } else if (nearestPoint) {
+      console.log('Sliding to', nearestPoint);
+      this.slideTo(nearestPoint);
+    }
     /*
     else if (this.openHeightMiddle && this.y <= this.getOpenMiddleY()) {
       opened = true;
@@ -325,12 +359,6 @@ export class Drawer implements ComponentInterface {
       */
     else {
       // Otherwise, close it
-      opened = false;
-    }
-
-    if (opened) {
-      this.slideOpenToEnd();
-    } else {
       this.slideClose();
     }
   }
@@ -364,7 +392,7 @@ export class Drawer implements ComponentInterface {
     this.el.style.transform = `translateY(${this.y}px) translateZ(0)`;
   }
 
-  private slideOpenToEnd() {
+  private slideOpen() {
     // const startY = this.y;
     // const screenHeight = window.innerHeight;
     // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
@@ -415,8 +443,14 @@ export class Drawer implements ComponentInterface {
   }
 
   private getClosedY() {
-    const screenHeight = window.innerHeight;
+    // If the drawer is set to not fully close, then the closed position
+    // is just the first preview offset point
+    if (!this.canClose) {
+      return this.points[0];
+    }
 
+    // Otherwise, return a position that is just off screen
+    const screenHeight = window.innerHeight;
     return screenHeight + 20;
   }
 
@@ -446,8 +480,18 @@ export class Drawer implements ComponentInterface {
     this.fireToggled(false, this.getClosedY());
   }
 
-  @Watch('openTo')
+  @Watch('snapTo')
   handleOpenedChange() {
+    let point;
+    if (this.snapTo === -1) {
+      point = this.points[this.points.length - 1];
+    } else {
+      point = this.points[this.snapTo];
+    }
+
+    console.log('Sliding to', point, this.snapTo);
+
+    this.slideTo(point);
     /*
     if (this.openTo === 'end' && !this.isOpenToEnd()) {
       this.slideOpenToEnd();
