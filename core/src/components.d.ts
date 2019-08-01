@@ -745,30 +745,22 @@ export namespace Components {
     */
     'cssClass'?: string | string[];
     /**
-    * The max position to allow the user to open the drawer to. Set this value equal to the open height in order to prevent the user from opening the drawer fully.  Once this limit is reached, the drawer will rubber band slightly beyond it.
+    * The max position to allow the user to open the drawer to. If this value is not set the drawer will open the full height of the screen.  Once this limit is reached, the drawer will rubber band slightly beyond it.
     */
     'maxOffset'?: number;
     /**
     * The mode determines which platform styles to use.
     */
     'mode'?: "ios" | "md";
+    'overlayIndex': number;
     /**
-    * The height of the element when fully. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    * The amount to show as a preview. If this is not set the drawer will start closed.
     */
-    'openHeightEnd'?: number;
-    /**
-    * The height of the element when partially opened. If not set the middle position will not be used
-    */
-    'openHeightMiddle'?: number;
-    /**
-    * The height of the element when in its starting position
-    */
-    'openHeightStart'?: number;
+    'previewOffset': number;
     /**
     * Whether the drawer is opened.
     */
-    'openTo': 'start' | 'middle' | 'end' | 'closed';
-    'overlayIndex': number;
+    'snapPoints': string;
   }
   interface IonFab {
     /**
@@ -4149,7 +4141,7 @@ declare namespace LocalJSX {
     */
     'cssClass'?: string | string[];
     /**
-    * The max position to allow the user to open the drawer to. Set this value equal to the open height in order to prevent the user from opening the drawer fully.  Once this limit is reached, the drawer will rubber band slightly beyond it.
+    * The max position to allow the user to open the drawer to. If this value is not set the drawer will open the full height of the screen.  Once this limit is reached, the drawer will rubber band slightly beyond it.
     */
     'maxOffset'?: number;
     /**
@@ -4165,21 +4157,13 @@ declare namespace LocalJSX {
     */
     'onIonDrawerOpen'?: (event: CustomEvent<void>) => void;
     /**
-    * The height of the element when fully. If not set, the height will be computed and set to the height of the screen minus some padding for any top notch
+    * The amount to show as a preview. If this is not set the drawer will start closed.
     */
-    'openHeightEnd'?: number;
-    /**
-    * The height of the element when partially opened. If not set the middle position will not be used
-    */
-    'openHeightMiddle'?: number;
-    /**
-    * The height of the element when in its starting position
-    */
-    'openHeightStart'?: number;
+    'previewOffset'?: number;
     /**
     * Whether the drawer is opened.
     */
-    'openTo'?: 'start' | 'middle' | 'end' | 'closed';
+    'snapPoints'?: string;
   }
   interface IonFab extends JSXBase.HTMLAttributes<HTMLIonFabElement> {
     /**
