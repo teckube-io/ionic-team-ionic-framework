@@ -12,23 +12,27 @@
   <script type="module" src="../../../../../dist/ionic/ionic.esm.js"></script></head>
 
 <body class="ion-padding">
-  <h1>Default</h1>
-
-  <ion-button onclick="showDrawer(0)">Start (0)</ion-button>
-  <ion-button onclick="showDrawer(1)">1</ion-button>
-  <ion-button onclick="showDrawer(2)">2</ion-button>
-  <ion-button onclick="showDrawer(-1)">End (-1)</ion-button>
-  <ion-button onclick="closeDrawer()">Close</ion-button>
-  <ion-button onclick="openDrawer()">Open</ion-button>
-
-  <!--
-  <ion-drawer id="drawer" partially-open-height="300">
-  </ion-drawer>
-  <ion-drawer id="drawer">
-  </ion-drawer>
-  -->
+  <div id="parallax" class="parallax">
+  </div>
   <ion-drawer id="drawer" snap-offsets="200,300" preview-offset="100" can-close="false">
   </ion-drawer>
+
+  <style>
+    .parallax {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: 200%;
+      background-position: 20% 0;
+      z-index: 1;
+
+      transform: translate3d(0, 0, 0);
+              
+      background-image: url('parallax/img.jpg');
+    }
+  </style>
 
   <script>
     function showDrawer(where) {
@@ -49,20 +53,70 @@
     }
 
     const drawer = document.querySelector('#drawer');
-    drawer.addEventListener('ionDrawerClose', (e) => {
+    drawer.addEventListener('ionDrawerWillClose', async (e) => {
       console.log('Drawer closed!', e);
       drawer.snapTo = null;
+      animateParallax(false, e.detail.y);
     });
+    drawer.addEventListener('ionDrawerWillOpen', async (e) => {
+      console.log('Drawer open', e);
+      animateParallax(true, e.detail.y);
+    });
+
+    const bgRef = document.querySelector('#parallax');
+
+    let startingY;
+
+    function disableParallaxAnimation() {
+      // bgRef.style.transition = '';
+    }
+
+    function animateParallax (expanded, finalY) {
+      console.log('Animate parallax', expanded, finalY);
+
+      if (!bgRef) {
+        return;
+      }
+
+      bgRef.style.transition = '100ms transform ease-in-out';
+
+      const diff = startingY - finalY;
+      const offset = -diff * 0.2;
+
+      window.requestAnimationFrame(() => {
+        bgRef.style.transform = `translate3d(0, ${offset}px, 0)`;
+      });
+    }
 
     drawer.addEventListener('ionDrawerPositionChange', (e) => {
       console.log('Drawer change', e.detail);
+
+          // If we don't have a starting y, then store it and use it to compute the
+      // absolute delta from the starting position, so we can compute the parallax amount
+      if (!startingY) {
+        startingY = e.detail.y;
+      }
+
+      // Turn off any CSS animation for the image we will apply a parallax effect to
+      disableParallaxAnimation();
+
+      const diff = startingY - e.detail.y;
+
+      console.log('DIFF', diff);
+
+      window.requestAnimationFrame(() => {
+        if (diff <= 0) {
+          // We are bottomed out, so should rubber band the image
+          const scale = 1 + -diff * 0.00025;
+          bgRef.style.transform = `translate3d(0, 0, 0) scale(${scale})`;
+        } else {
+          // If the diff is > zero, that means
+          // we are not bottomed-out and should just slide the image up
+          const y = -diff * 0.2;
+          bgRef.style.transform = `translate3d(0, ${y}px, 0)`;
+        }
+      });
     })
-    drawer.addEventListener('ionDrawerOpen', (e) => {
-      console.log('Drawer open', e.detail);
-    });
-    drawer.addEventListener('ionDrawerClose', (e) => {
-      console.log('Drawer close', e.detail);
-    });
 
     drawer.innerHTML = `
     <ion-content>

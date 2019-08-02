@@ -72,6 +72,10 @@ import {
   ViewController,
 } from './interface';
 import {
+  DrawerPositionChangeEventDetail,
+  DrawerToggleEventDetail,
+} from './components/drawer/drawer-interface';
+import {
   SelectCompareFn,
 } from './components/select/select-interface';
 
@@ -4163,11 +4167,23 @@ declare namespace LocalJSX {
     /**
     * Emitted after the drawer has closed.
     */
-    'onIonDrawerClose'?: (event: CustomEvent<void>) => void;
+    'onIonDrawerDidClose'?: (event: CustomEvent<DrawerToggleEventDetail>) => void;
     /**
     * Emitted after the drawer has opened.
     */
-    'onIonDrawerOpen'?: (event: CustomEvent<void>) => void;
+    'onIonDrawerDidOpen'?: (event: CustomEvent<DrawerToggleEventDetail>) => void;
+    /**
+    * Emitted when the drawer position has changed
+    */
+    'onIonDrawerPositionChange'?: (event: CustomEvent<DrawerPositionChangeEventDetail>) => void;
+    /**
+    * Emitted before the drawer will close.
+    */
+    'onIonDrawerWillClose'?: (event: CustomEvent<DrawerToggleEventDetail>) => void;
+    /**
+    * Emitted before the drawer will open.
+    */
+    'onIonDrawerWillOpen'?: (event: CustomEvent<DrawerToggleEventDetail>) => void;
     /**
     * The amount to show as a preview. If this is not set the drawer will start closed. Values are relative to the main axis of the drawer. See `snapTo` above for more information.
     */

@@ -4,6 +4,7 @@ import { getIonMode } from '../../global/ionic-global';
 import { Animation } from '../../interface';
 import { getClassMap } from '../../utils/theme';
 import { GestureDetail, Gesture } from '../../utils/gesture';
+import { DrawerPositionChangeEventDetail, DrawerToggleEventDetail } from './drawer-interface';
 
 /*
 import { iosEnterAnimation } from './animations/ios.enter';
@@ -105,14 +106,29 @@ export class Drawer implements ComponentInterface {
   @Prop() cssClass?: string | string[];
 
   /**
+   * Emitted when the drawer position has changed
+   */
+  @Event({ eventName: 'ionDrawerPositionChange' }) positionChange!: EventEmitter<DrawerPositionChangeEventDetail>;
+
+  /**
    * Emitted after the drawer has opened.
    */
-  @Event({ eventName: 'ionDrawerOpen' }) didOpen!: EventEmitter<void>;
+  @Event({ eventName: 'ionDrawerDidOpen' }) didOpen!: EventEmitter<DrawerToggleEventDetail>;
+
+  /**
+   * Emitted before the drawer will open.
+   */
+  @Event({ eventName: 'ionDrawerWillOpen' }) willOpen!: EventEmitter<DrawerToggleEventDetail>;
 
   /**
    * Emitted after the drawer has closed.
    */
-  @Event({ eventName: 'ionDrawerClose' }) didClose!: EventEmitter<void>;
+  @Event({ eventName: 'ionDrawerDidClose' }) didClose!: EventEmitter<DrawerToggleEventDetail>;
+
+  /**
+   * Emitted before the drawer will close.
+   */
+  @Event({ eventName: 'ionDrawerWillClose' }) willClose!: EventEmitter<DrawerToggleEventDetail>;
 
   async componentDidLoad() {
     const screenHeight = window.innerHeight;
@@ -144,19 +160,7 @@ export class Drawer implements ComponentInterface {
     this.sizeElement();
     this.slideTo(this.y);
 
-    /*
-    this.onPositionChange && this.onPositionChange({
-      startx: 0,
-      starty: 0,
-      x: 0,
-      y: this.y,
-      dx: 0,
-      dy: 0,
-      vx: 0,
-      vy: 0
-    });
-    */
-
+    this.fireChange(this.y);
 
     // Wait a frame to enable the animation to avoid having it run on start
     requestAnimationFrame(() => {
@@ -313,7 +317,7 @@ export class Drawer implements ComponentInterface {
     }
 
     this.lastY = detail.currentY;
-    // this.onPositionChange && this.onPositionChange(detail);
+    this.fireChange(this.y, detail);
   }
 
   private onGestureEnd = (detail: GestureDetail) => {
@@ -331,13 +335,13 @@ export class Drawer implements ComponentInterface {
     if (detail.velocityY < -0.6) {
       console.log('Sliding open due to velocity');
       // User threw the drawer up, open it
-      this.slideOpen();
+      this.slideOpen(detail);
     } else if (detail.velocityY > 0.6) {
       // User threw the drawer down, close it
-      this.slideClose();
+      this.slideClose(detail);
     } else if (nearestPoint) {
       console.log('Sliding to', nearestPoint);
-      this.slideTo(nearestPoint);
+      this.slideTo(nearestPoint, detail);
     }
     /*
     else if (this.openHeightMiddle && this.y <= this.getOpenMiddleY()) {
@@ -387,53 +391,30 @@ export class Drawer implements ComponentInterface {
     this.slideTo(this.y + dy);
   }
 
-  private slideTo(y: number) {
+  private slideTo(y: number, gestureDetail?: GestureDetail) {
     this.y = y;
     this.el.style.transform = `translateY(${this.y}px) translateZ(0)`;
+    this.fireChange(y, gestureDetail);
   }
 
-  private slideOpen() {
+  private slideOpen(gestureDetail?: GestureDetail) {
     // const startY = this.y;
     // const screenHeight = window.innerHeight;
     // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
-    this.slideTo(this.getMaxY());
+    this.fireWillOpen();
+    this.slideTo(this.getMaxY(), gestureDetail);
     this.afterTransition(() => {
-      this.fireOpen();
+      this.fireDidOpen();
       this.growContentHeight(0);
     });
   }
 
-  /*
-  private slideOpenToPoint(point: number) {
+  private slideClose(gestureDetail?: GestureDetail) {
     // const startY = this.y;
-    // const screenHeight = window.innerHeight;
-    // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
-    this.slideTo(point);
+    this.fireWillClose();
+    this.slideTo(this.getClosedY(), gestureDetail);
     this.afterTransition(() => {
-      this.fireOpenToPoint(point);
-      this.growContentHeight(0);
-    });
-  }
-
-  private slideOpenToStart() {
-    // const startY = this.y;
-    // const screenHeight = window.innerHeight;
-    // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
-    this.slideTo(this.minY);
-    this.afterTransition(() => {
-      this.fireOpenToStart();
-      this.growContentHeight(0);
-    });
-  }
-  */
-
-  private slideClose() {
-    // const startY = this.y;
-    const finalY = this.getClosedY();
-    console.log('Sliding close', finalY);
-    this.slideTo(finalY);
-    this.afterTransition(() => {
-      this.fireClose();
+      this.fireDidClose();
       this.growContentHeight(0);
     });
   }
@@ -454,30 +435,44 @@ export class Drawer implements ComponentInterface {
     return screenHeight + 20;
   }
 
-  private fireToggled(isOpened: boolean, _finalY: number) {
+
+  private fireWill(isOpened: boolean, finalY: number) {
     if (isOpened) {
-      this.didOpen.emit();
+      this.willOpen.emit({ y: finalY });
     } else {
-      this.didClose.emit();
+      this.willClose.emit({ y: finalY });
     }
   }
 
-  private fireOpen() {
-    this.fireToggled(true, this.maxY);
+  private fireWillOpen() {
+    this.fireWill(true, this.getMaxY());
   }
 
-  /*
-  private fireOpenToPoint(point: number) {
-    this.fireToggled(true, point);
+  private fireWillClose() {
+    this.fireWill(false, this.getMaxY());
   }
 
-  private fireOpenToStart() {
-    this.fireToggled(true, this.previewOffset);
-  }
-  */
+  private fireDid(isOpened: boolean, finalY: number) {
 
-  private fireClose() {
-    this.fireToggled(false, this.getClosedY());
+    if (isOpened) {
+      this.didOpen.emit({ y: finalY });
+    } else {
+      this.didClose.emit({ y: finalY });
+    }
+  }
+  private fireDidOpen() {
+    this.fireDid(true, this.getMaxY());
+  }
+
+  private fireDidClose() {
+    this.fireDid(false, this.getClosedY());
+  }
+
+  private fireChange(y: number, gestureDetail?: GestureDetail) {
+    this.positionChange.emit({
+      y,
+      gestureDetail
+    });
   }
 
   @Watch('snapTo')
