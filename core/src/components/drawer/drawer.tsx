@@ -1,7 +1,6 @@
 import { Component, ComponentInterface, Element, Event, EventEmitter, Prop, h, Watch } from '@stencil/core';
 
 import { getIonMode } from '../../global/ionic-global';
-import { Animation } from '../../interface';
 import { getClassMap } from '../../utils/theme';
 import { GestureDetail, Gesture } from '../../utils/gesture';
 import { DrawerPositionChangeEventDetail, DrawerToggleEventDetail } from './drawer-interface';
@@ -25,8 +24,6 @@ import { mdLeaveAnimation } from './animations/md.leave';
   shadow: true
 })
 export class Drawer implements ComponentInterface {
-  presented = false;
-  animation?: Animation;
   mode = getIonMode(this);
   // Animation duration
   animationDuration = 400;
@@ -317,7 +314,7 @@ export class Drawer implements ComponentInterface {
     }
 
     this.lastY = detail.currentY;
-    this.fireChange(this.y, detail);
+    this.fireChange(this.y, false, detail);
   }
 
   private onGestureEnd = (detail: GestureDetail) => {
@@ -341,7 +338,7 @@ export class Drawer implements ComponentInterface {
       this.slideClose(detail);
     } else if (nearestPoint) {
       console.log('Sliding to', nearestPoint);
-      this.slideTo(nearestPoint, detail);
+      this.slideTo(nearestPoint, true, detail);
     }
     /*
     else if (this.openHeightMiddle && this.y <= this.getOpenMiddleY()) {
@@ -388,13 +385,13 @@ export class Drawer implements ComponentInterface {
   }
 
   private slideBy(dy: number) {
-    this.slideTo(this.y + dy);
+    this.slideTo(this.y + dy, false);
   }
 
-  private slideTo(y: number, gestureDetail?: GestureDetail) {
+  private slideTo(y: number, isSnap: boolean = false, gestureDetail?: GestureDetail) {
     this.y = y;
     this.el.style.transform = `translateY(${this.y}px) translateZ(0)`;
-    this.fireChange(y, gestureDetail);
+    this.fireChange(y, isSnap, gestureDetail);
   }
 
   private slideOpen(gestureDetail?: GestureDetail) {
@@ -402,7 +399,7 @@ export class Drawer implements ComponentInterface {
     // const screenHeight = window.innerHeight;
     // this.slideTo((screenHeight - this.openHeight) - this.topPadding);
     this.fireWillOpen();
-    this.slideTo(this.getMaxY(), gestureDetail);
+    this.slideTo(this.getMaxY(), true, gestureDetail);
     this.afterTransition(() => {
       this.fireDidOpen();
       this.growContentHeight(0);
@@ -412,7 +409,7 @@ export class Drawer implements ComponentInterface {
   private slideClose(gestureDetail?: GestureDetail) {
     // const startY = this.y;
     this.fireWillClose();
-    this.slideTo(this.getClosedY(), gestureDetail);
+    this.slideTo(this.getClosedY(), true, gestureDetail);
     this.afterTransition(() => {
       this.fireDidClose();
       this.growContentHeight(0);
@@ -468,9 +465,10 @@ export class Drawer implements ComponentInterface {
     this.fireDid(false, this.getClosedY());
   }
 
-  private fireChange(y: number, gestureDetail?: GestureDetail) {
+  private fireChange(y: number, isSnap: boolean = false, gestureDetail?: GestureDetail) {
     this.positionChange.emit({
       y,
+      isSnap,
       gestureDetail
     });
   }
@@ -489,7 +487,7 @@ export class Drawer implements ComponentInterface {
         point = this.points[this.snapTo];
       }
 
-      this.slideTo(point);
+      this.slideTo(point, true);
     }
   }
 

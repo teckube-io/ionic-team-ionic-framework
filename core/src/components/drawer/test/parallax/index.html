@@ -91,14 +91,19 @@
     drawer.addEventListener('ionDrawerPositionChange', (e) => {
       console.log('Drawer change', e.detail);
 
+
           // If we don't have a starting y, then store it and use it to compute the
       // absolute delta from the starting position, so we can compute the parallax amount
       if (!startingY) {
         startingY = e.detail.y;
       }
 
-      // Turn off any CSS animation for the image we will apply a parallax effect to
-      disableParallaxAnimation();
+      if (e.detail.isSnap) {
+        animateParallax(true, e.detail.y);
+      } else {
+        // Turn off any CSS animation for the image we will apply a parallax effect to
+        disableParallaxAnimation();
+      }
 
       const diff = startingY - e.detail.y;
 
