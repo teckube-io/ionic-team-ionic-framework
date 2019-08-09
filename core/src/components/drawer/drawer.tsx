@@ -232,7 +232,6 @@ export class Drawer implements ComponentInterface {
       document.body.appendChild(div);
       const paddingBottomStyle = window.getComputedStyle(div).paddingBottom;
       const calculatedPadding = parseInt(paddingBottomStyle || '0', 10);
-      console.log('Calculated padding', calculatedPadding);
       document.body.removeChild(div);
       if (calculatedPadding > 0) {
         return true;

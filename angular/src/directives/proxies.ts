@@ -212,13 +212,16 @@ proxyInputs(IonDatetime, ['cancelText', 'dayNames', 'dayShortNames', 'dayValues'
 export declare interface IonDrawer extends Components.IonDrawer {}
 @Component({ selector: 'ion-drawer', changeDetection: ChangeDetectionStrategy.OnPush, template: '<ng-content></ng-content>', inputs: ['canClose', 'cssClass', 'maxOffset', 'mode', 'previewOffset', 'snapOffsets', 'snapTo'] })
 export class IonDrawer {
-  ionDrawerOpen!: EventEmitter<CustomEvent>;
-  ionDrawerClose!: EventEmitter<CustomEvent>;
+  ionDrawerPositionChange!: EventEmitter<CustomEvent>;
+  ionDrawerDidOpen!: EventEmitter<CustomEvent>;
+  ionDrawerWillOpen!: EventEmitter<CustomEvent>;
+  ionDrawerDidClose!: EventEmitter<CustomEvent>;
+  ionDrawerWillClose!: EventEmitter<CustomEvent>;
   protected el: HTMLElement;
   constructor(c: ChangeDetectorRef, r: ElementRef) {
     c.detach();
     this.el = r.nativeElement;
-    proxyOutputs(this, this.el, ['ionDrawerOpen', 'ionDrawerClose']);
+    proxyOutputs(this, this.el, ['ionDrawerPositionChange', 'ionDrawerDidOpen', 'ionDrawerWillOpen', 'ionDrawerDidClose', 'ionDrawerWillClose']);
   }
 }
 proxyInputs(IonDrawer, ['canClose', 'cssClass', 'maxOffset', 'mode', 'previewOffset', 'snapOffsets', 'snapTo']);
