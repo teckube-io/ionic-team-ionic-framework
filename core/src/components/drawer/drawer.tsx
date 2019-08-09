@@ -135,8 +135,6 @@ export class Drawer implements ComponentInterface {
     this.maxY = this.getMaxY();
     this.minY = this.getMinY();
 
-    console.log('Got snap points', this.points);
-
     if (!this.canClose && !this.previewOffset) {
       console.warn('Drawer canClose set to false but no previewOffset provided! Drawer will close to avoid undefined behavior');
       this.canClose = true;
@@ -149,8 +147,6 @@ export class Drawer implements ComponentInterface {
 
     // Set the starting Y position
     const startingY = this.points[0] || 0;
-
-    console.log('Starting Y', startingY);
 
     this.y = startingY ? startingY : screenHeight + 20;
 
@@ -293,17 +289,13 @@ export class Drawer implements ComponentInterface {
       isBeyond = true;
     }
 
-    console.log('Dragging, is beyond?', isBeyond, this.y, this.maxY);
-
     // Check if the user has dragged beyond our limit
     if (isBeyond) {
       // Grow the content area slightly
-      // const screenHeight = window.innerHeight;
-
       const openY = this.maxY;
       const overAmount = openY - this.y;
-
       this.growContentHeight(overAmount);
+
       // When we're above the limit, let the user pull but at a
       // slower rate (to give a sense of friction)
       this.slideBy(dy * 0.3);
@@ -325,18 +317,13 @@ export class Drawer implements ComponentInterface {
       return point < this.y
     });
 
-    console.log('End drag', detail, this.y, this.points, nearestPoint);
-
-
     if (detail.velocityY < -0.6) {
-      console.log('Sliding open due to velocity');
       // User threw the drawer up, open it
       this.slideOpen(detail);
     } else if (detail.velocityY > 0.6) {
       // User threw the drawer down, close it
       this.slideClose(detail);
     } else if (nearestPoint) {
-      console.log('Sliding to', nearestPoint);
       this.slideTo(nearestPoint, true, detail);
     }
     /*
