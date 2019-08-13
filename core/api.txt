@@ -414,7 +414,7 @@ ion-infinite-scroll,prop,disabled,boolean,false,false,false
 ion-infinite-scroll,prop,position,"bottom" | "top",'bottom',false,false
 ion-infinite-scroll,prop,threshold,string,'15%',false,false
 ion-infinite-scroll,method,complete,complete() => Promise<void>
-ion-infinite-scroll,event,ionInfinite,void,true
+ion-infinite-scroll,event,ionInfinite,InfiniteEventDetail,true
 
 ion-infinite-scroll-content,none
 ion-infinite-scroll-content,prop,loadingSpinner,"bubbles" | "circles" | "circular" | "crescent" | "dots" | "lines" | "lines-small" | null | undefined,undefined,false,false

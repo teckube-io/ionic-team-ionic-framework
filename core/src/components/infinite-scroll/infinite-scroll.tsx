@@ -1,6 +1,7 @@
 import { Component, ComponentInterface, Element, Event, EventEmitter, Host, Method, Prop, State, Watch, h, readTask, writeTask } from '@stencil/core';
 
 import { getIonMode } from '../../global/ionic-global';
+import { InfiniteEventDetail } from '../../interface';
 
 @Component({
   tag: 'ion-infinite-scroll',
@@ -74,7 +75,7 @@ export class InfiniteScroll implements ComponentInterface {
    * you must call the infinite scroll's `complete()` method when
    * your async operation has completed.
    */
-  @Event() ionInfinite!: EventEmitter<void>;
+  @Event() ionInfinite!: EventEmitter<InfiniteEventDetail>;
 
   async componentDidLoad() {
     const contentEl = this.el.closest('ion-content');
@@ -121,7 +122,9 @@ export class InfiniteScroll implements ComponentInterface {
       if (!this.didFire) {
         this.isLoading = true;
         this.didFire = true;
-        this.ionInfinite.emit();
+        this.ionInfinite.emit({
+          complete: this.completeSync.bind(this)
+        });
         return 3;
       }
     } else {
@@ -143,6 +146,10 @@ export class InfiniteScroll implements ComponentInterface {
    */
   @Method()
   async complete() {
+    return this.completeSync();
+  }
+
+  private completeSync() {
     const scrollEl = this.scrollEl;
     if (!this.isLoading || !scrollEl) {
       return;

@@ -24,6 +24,7 @@ import {
   FrameworkDelegate,
   HeaderFn,
   HeaderHeightFn,
+  InfiniteEventDetail,
   InputChangeEventDetail,
   IonicAnimation,
   ItemHeightFn,
@@ -4387,7 +4388,7 @@ declare namespace LocalJSX {
     /**
     * Emitted when the scroll reaches the threshold distance. From within your infinite handler, you must call the infinite scroll's `complete()` method when your async operation has completed.
     */
-    'onIonInfinite'?: (event: CustomEvent<void>) => void;
+    'onIonInfinite'?: (event: CustomEvent<InfiniteEventDetail>) => void;
     /**
     * The position of the infinite scroll element. The value can be either `top` or `bottom`.
     */
