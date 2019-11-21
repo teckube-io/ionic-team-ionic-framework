@@ -65,3 +65,7 @@
     backdrop-filter: $popover-ios-translucent-filter;
   }
 }
+
+ion-backdrop {
+  opacity: 0.08;
+}
