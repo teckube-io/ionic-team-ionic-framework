@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Tab - Basic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link href="../../../../../css/ionic.bundle.css" rel="stylesheet">
+  <link href="../../../../../scripts/testing/styles.css" rel="stylesheet">
+  <script src="../../../../../scripts/testing/scripts.js"></script>
+  <script nomodule src="../../../../../dist/ionic/ionic.js"></script>
+  <script type="module" src="../../../../../dist/ionic/ionic.esm.js"></script>
+</head>
+
+<body>
+
+  <ion-app>
+    <ion-tabs>
+      <ion-tab tab="tab-one">
+        <ion-header translucent="true">
+          <ion-toolbar>
+            <ion-title>Tab One</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content fullscreen="true">
+          <ion-header collapse="condense">
+            <ion-toolbar>
+              <ion-title size="large">Tab One</ion-title>
+            </ion-toolbar>
+          </ion-header>
+
+          <ion-fab slot="fixed" horizontal="end" vertical="bottom">
+            <ion-fab-button class="custom-white">
+              <ion-icon name="add"></ion-icon>
+            </ion-fab-button>
+          </ion-fab>
+
+          <ion-grid>
+            <ion-row>
+              <ion-col size="6">
+                <f class="red"></f>
+              </ion-col>
+              <ion-col size="6">
+                <f class="green"></f>
+              </ion-col>
+              <ion-col size="6">
+                <f class="blue"></f>
+              </ion-col>
+              <ion-col size="6">
+                <f class="yellow"></f>
+              </ion-col>
+              <ion-col size="6">
+                <f class="pink"></f>
+              </ion-col>
+              <ion-col size="6">
+                <f class="purple"></f>
+              </ion-col>
+              <ion-col size="6">
+                <f class="black"></f>
+              </ion-col>
+              <ion-col size="6">
+                <f class="orange"></f>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-content>
+      </ion-tab>
+
+      <ion-tab tab="schedule">
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Tab Two</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <h1>Tab Two</h1>
+        </ion-content>
+      </ion-tab>
+
+      <ion-tab-bar slot="bottom" translucent="true">
+        <ion-tab-button href="" tab="tab-one" class="e2eTabOneButton">
+          <ion-label>Tab One</ion-label>
+          <ion-icon name="star"></ion-icon>
+        </ion-tab-button>
+
+        <ion-tab-button tab="schedule" class="e2eTabTwoButton">
+          <ion-label>Tab Two</ion-label>
+          <ion-icon name="globe"></ion-icon>
+          <ion-badge color="danger">6</ion-badge>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </ion-tabs>
+  </ion-app>
+  <style>
+    f {
+      display: block;
+      background: blue;
+
+      width: 100%;
+      height: 200px;
+      margin: 20px auto;
+    }
+
+    .red {
+      background-color: #ea445a;
+    }
+
+    .green {
+      background-color: #76d672;
+    }
+
+    .blue {
+      background-color: #3478f6;
+    }
+
+    .yellow {
+      background-color: #ffff80;
+    }
+
+    .pink {
+      background-color: #ff6b86;
+    }
+
+    .purple {
+      background-color: #7e34f6;
+    }
+
+    .black {
+      background-color: #000;
+    }
+
+    .orange {
+      background-color: #f69234;
+    }
+
+  </style>
+</body>
+
+</html>

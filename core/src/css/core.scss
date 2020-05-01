@@ -91,6 +91,10 @@ html.ios ion-modal .ion-page {
   z-index: $z-index-page-container;
 }
 
+ion-tab.ion-page {
+  overflow: visible;
+}
+
 .split-pane-visible > .ion-page.split-pane-main {
   position: relative;
 }
