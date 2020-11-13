@@ -111,7 +111,7 @@ export const iosEnterAnimation = (baseEl: HTMLElement, ev?: Event): Animation =>
     .afterClearStyles(['pointer-events']);
 
   wrapperAnimation
-    .addElement(baseEl.querySelector('.popover-wrapper')!)
+    .addElement(baseEl.querySelectorAll('.popover-content, .popover-arrow')!)
     .fromTo('opacity', 0.01, 1);
 
   return baseAnimation

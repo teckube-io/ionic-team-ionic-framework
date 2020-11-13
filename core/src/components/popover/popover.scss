@@ -44,8 +44,11 @@
 }
 
 .popover-wrapper {
-  opacity: 0;
   z-index: $z-index-overlay-wrapper;
+}
+
+.popover-content, .popover-arrow {
+  opacity: 0;
 }
 
 .popover-content {
