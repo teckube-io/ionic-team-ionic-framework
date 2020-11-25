@@ -50,7 +50,7 @@ export const enableScrollAssist = (
   };
 };
 
-const waitForKeyboardHeight = () => {
+const waitForKeyboardHeight = (defaultKeyboardHeight: number) => {
   const win = window as any;
   /**
    * If the keyboard is already open
@@ -65,7 +65,7 @@ const waitForKeyboardHeight = () => {
    * an educated guess at the height of the keyboard
    */
   if (!win.Capacitor?.isPluginAvailable('Keyboard')) {
-    keyboardHeight = 250;
+    keyboardHeight = defaultKeyboardHeight;
     return Promise.resolve(keyboardHeight);
   }
 
@@ -86,20 +86,19 @@ const waitForKeyboardHeight = () => {
 }
 
 const adjustInputScroll = async (
-  inputEl: HTMLInputElement | HTMLTextAreaElement,
-  contentEl: HTMLIonContentElement
+  inputBox: DOMRect,
+  contentEl: HTMLIonContentElement,
+  defaultKeyboardHeight: number
 ) => {
   const contentBox = contentEl.getBoundingClientRect();
-  const inputBox = inputEl.getBoundingClientRect();
 
-  await waitForKeyboardHeight();
+  await waitForKeyboardHeight(defaultKeyboardHeight);
 
   const safeAreaBottom = contentBox.height - keyboardHeight;
   const scrollBy = inputBox.bottom - safeAreaBottom;
 
-  console.log('adjusting input scroll', scrollBy)
   if (scrollBy > 0) {
-    await contentEl.scrollByPoint(0, scrollBy, 200);
+    await contentEl.scrollByPoint(0, scrollBy, 300);
   }
 }
 
@@ -120,6 +119,8 @@ const jsSetFocus = async (
     return;
   }
 
+  const inputBox = inputEl.getBoundingClientRect();
+
   // temporarily move the focus to the focus holder so the browser
   // doesn't freak out while it's trying to get the input in place
   // at this point the native text input still does not have focus
@@ -128,7 +129,7 @@ const jsSetFocus = async (
 
   /* tslint:disable-next-line */
   if (typeof window !== 'undefined' && contentEl) {
-    await adjustInputScroll(inputEl, contentEl);
+    await adjustInputScroll(inputBox, contentEl!, keyboardHeight);
 
     // the ll view is ie correct position now
     // give the native text input focus

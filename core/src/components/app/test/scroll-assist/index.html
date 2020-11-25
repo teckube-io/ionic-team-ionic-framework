@@ -85,27 +85,5 @@
       </ion-item>
     </ion-content>
   </ion-app>
-
-  <script>
-    window.Ionic = {
-      config: {
-        scrollAssist: true,
-        scrollPadding: true
-      }
-    }
-
-    let keyboardHeight = 0;
-
-    window.addEventListener('ionKeyboardDidShow', (ev) => {
-      keyboardHeight = ev.detail.keyboardHeight;
-      console.log('keyboard height', keyboardHeight)
-    });
-
-    window.addEventListener('ionKeyboardDidHide', (ev) => {
-      keyboardHeight = 0;
-      console.log('closed keyboard')
-    });
-  </script>
-
 </body>
 </html>

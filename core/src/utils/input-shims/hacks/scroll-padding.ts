@@ -20,10 +20,7 @@ export const enableScrollPadding = (keyboardHeight: number) => {
 };
 
 const setScrollPadding = (input: HTMLElement, keyboardHeight: number) => {
-  if (input.tagName !== 'INPUT') {
-    return;
-  }
-  if (input.parentElement && input.parentElement.tagName === 'ION-INPUT') {
+  if (input.tagName !== 'INPUT' && input.tagName !== 'TEXTAREA') {
     return;
   }
   if (
