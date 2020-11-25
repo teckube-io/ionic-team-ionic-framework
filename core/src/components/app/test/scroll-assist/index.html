@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>App - Scroll Assist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link href="../../../../../css/ionic.bundle.css" rel="stylesheet">
+  <link href="../../../../../scripts/testing/styles.css" rel="stylesheet">
+  <script src="../../../../../scripts/testing/scripts.js"></script>
+  <script nomodule src="../../../../../dist/ionic/ionic.js"></script>
+  <script type="module" src="../../../../../dist/ionic/ionic.esm.js"></script>
+</head>
+
+<body>
+  <ion-app>
+    <ion-header translucent="true">
+      <ion-toolbar>
+        <ion-title>Title</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content fullscreen="true">
+      <ion-item>
+        <ion-label>Text Input</ion-label>
+        <ion-input type="text"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Password Input</ion-label>
+        <ion-input type="password"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Native Text Input</ion-label>
+        <input type="text" />
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Native Password Input</ion-label>
+        <input type="password" />
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Textarea Input</ion-label>
+        <ion-textarea></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Native Textarea Input</ion-label>
+        <textarea></textarea>
+      </ion-item>
+
+
+      <br /><br /><br />
+
+      <ion-item>
+        <ion-label>Text Input</ion-label>
+        <ion-input type="text"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Password Input</ion-label>
+        <ion-input type="password"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Native Text Input</ion-label>
+        <input type="text" />
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Native Password Input</ion-label>
+        <input type="password" />
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Textarea Input</ion-label>
+        <ion-textarea></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Native Textarea Input</ion-label>
+        <textarea></textarea>
+      </ion-item>
+    </ion-content>
+  </ion-app>
+
+  <script>
+    window.Ionic = {
+      config: {
+        scrollAssist: true,
+        scrollPadding: true
+      }
+    }
+
+    let keyboardHeight = 0;
+
+    window.addEventListener('ionKeyboardDidShow', (ev) => {
+      keyboardHeight = ev.detail.keyboardHeight;
+      console.log('keyboard height', keyboardHeight)
+    });
+
+    window.addEventListener('ionKeyboardDidHide', (ev) => {
+      keyboardHeight = 0;
+      console.log('closed keyboard')
+    });
+  </script>
+
+</body>
+</html>

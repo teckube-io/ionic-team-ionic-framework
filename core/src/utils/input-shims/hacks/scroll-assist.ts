@@ -3,6 +3,8 @@ import { pointerCoord } from '../../helpers';
 import { isFocused, relocateInput } from './common';
 import { getScrollData } from './scroll-data';
 
+let keyboardHeight = 0;
+
 export const enableScrollAssist = (
   componentEl: HTMLElement,
   inputEl: HTMLInputElement | HTMLTextAreaElement,
@@ -33,14 +35,73 @@ export const enableScrollAssist = (
       jsSetFocus(componentEl, inputEl, contentEl, footerEl, keyboardHeight);
     }
   };
-  componentEl.addEventListener('touchstart', touchStart, true);
-  componentEl.addEventListener('touchend', touchEnd, true);
+  /**
+   * Since ion-item can delegate focus to inputs,
+   * we need to list for touches on that too not
+   * just the input itself.
+   */
+  const parentEl = componentEl.closest('ion-item') || componentEl;
+  parentEl.addEventListener('touchstart', touchStart, true);
+  parentEl.addEventListener('touchend', touchEnd, true);
 
   return () => {
-    componentEl.removeEventListener('touchstart', touchStart, true);
-    componentEl.removeEventListener('touchend', touchEnd, true);
+    parentEl.removeEventListener('touchstart', touchStart, true);
+    parentEl.removeEventListener('touchend', touchEnd, true);
   };
 };
+
+const waitForKeyboardHeight = () => {
+  const win = window as any;
+  /**
+   * If the keyboard is already open
+   * no need to wait for the event.
+   */
+  if (keyboardHeight > 0) {
+    return Promise.resolve(keyboardHeight)
+  }
+
+  /**
+   * If not in Capacitor environment, just make
+   * an educated guess at the height of the keyboard
+   */
+  if (!win.Capacitor?.isPluginAvailable('Keyboard')) {
+    keyboardHeight = 250;
+    return Promise.resolve(keyboardHeight);
+  }
+
+  /**
+   * If keyboard is not open yet
+   * we need to wait for the event
+   * to fire and get the height of
+   * the keyboard.
+   */
+  return new Promise(resolve => {
+    const callback = (ev: any) => {
+      keyboardHeight = ev.keyboardHeight;
+      resolve(keyboardHeight);
+      window.removeEventListener('keyboardWillOpen', callback);
+    }
+    window.addEventListener('keyboardWillOpen', callback);
+  });
+}
+
+const adjustInputScroll = async (
+  inputEl: HTMLInputElement | HTMLTextAreaElement,
+  contentEl: HTMLIonContentElement
+) => {
+  const contentBox = contentEl.getBoundingClientRect();
+  const inputBox = inputEl.getBoundingClientRect();
+
+  await waitForKeyboardHeight();
+
+  const safeAreaBottom = contentBox.height - keyboardHeight;
+  const scrollBy = inputBox.bottom - safeAreaBottom;
+
+  console.log('adjusting input scroll', scrollBy)
+  if (scrollBy > 0) {
+    await contentEl.scrollByPoint(0, scrollBy, 200);
+  }
+}
 
 const jsSetFocus = async (
   componentEl: HTMLElement,
@@ -66,79 +127,14 @@ const jsSetFocus = async (
   inputEl.focus();
 
   /* tslint:disable-next-line */
-  if (typeof window !== 'undefined') {
-    let scrollContentTimeout: any;
-    const scrollContent = async () => {
-      // clean up listeners and timeouts
-      if (scrollContentTimeout !== undefined) {
-        clearTimeout(scrollContentTimeout);
-      }
+  if (typeof window !== 'undefined' && contentEl) {
+    await adjustInputScroll(inputEl, contentEl);
 
-      window.removeEventListener('ionKeyboardDidShow', doubleKeyboardEventListener);
-      window.removeEventListener('ionKeyboardDidShow', scrollContent);
-
-      // scroll the input into place
-      if (contentEl) {
-        await contentEl.scrollByPoint(0, scrollData.scrollAmount, scrollData.scrollDuration);
-      }
-
-      // the scroll view is in the correct position now
-      // give the native text input focus
-      relocateInput(componentEl, inputEl, false, scrollData.inputSafeY);
-
-      // ensure this is the focused input
-      inputEl.focus();
-    };
-
-    const doubleKeyboardEventListener = () => {
-      window.removeEventListener('ionKeyboardDidShow', doubleKeyboardEventListener);
-      window.addEventListener('ionKeyboardDidShow', scrollContent);
-    };
-
-    if (contentEl) {
-      const scrollEl = await contentEl.getScrollElement();
-
-      /**
-       * scrollData will only consider the amount we need
-       * to scroll in order to properly bring the input
-       * into view. It will not consider the amount
-       * we can scroll in the content element.
-       * As a result, scrollData may request a greater
-       * scroll position than is currently available
-       * in the DOM. If this is the case, we need to
-       * wait for the webview to resize/the keyboard
-       * to show in order for additional scroll
-       * bandwidth to become available.
-       */
-      const totalScrollAmount = scrollEl.scrollHeight - scrollEl.clientHeight;
-      if (scrollData.scrollAmount > (totalScrollAmount - scrollEl.scrollTop)) {
-
-        /**
-         * On iOS devices, the system will show a "Passwords" bar above the keyboard
-         * after the initial keyboard is shown. This prevents the webview from resizing
-         * until the "Passwords" bar is shown, so we need to wait for that to happen first.
-         */
-        if (inputEl.type === 'password') {
-
-          // Add 50px to account for the "Passwords" bar
-          scrollData.scrollAmount += 50;
-          window.addEventListener('ionKeyboardDidShow', doubleKeyboardEventListener);
-        } else {
-          window.addEventListener('ionKeyboardDidShow', scrollContent);
-        }
-
-        /**
-         * This should only fire in 2 instances:
-         * 1. The app is very slow.
-         * 2. The app is running in a browser on an old OS
-         * that does not support Ionic Keyboard Events
-         */
-        scrollContentTimeout = setTimeout(scrollContent, 1000);
-        return;
-      }
-    }
-
-    scrollContent();
+    // the ll view is ie correct position now
+    // give the native text input focus
+    relocateInput(componentEl, inputEl, false, scrollData.inputSafeY);
+    // ensure this is the focused input
+    inputEl.focus();
   }
 };
 
