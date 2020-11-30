@@ -5,6 +5,13 @@ import { getScrollData } from './scroll-data';
 
 let currentKeyboardHeight = 0;
 
+/**
+ * Clear out the keyboard height when it closes
+ * so we do not use a cached height the next time
+ * the keyboard opens.
+ */
+window.addEventListener('ionKeyboardDidHide', () => currentKeyboardHeight = 0);
+
 export const enableScrollAssist = (
   componentEl: HTMLElement,
   inputEl: HTMLInputElement | HTMLTextAreaElement,
@@ -87,12 +94,12 @@ const waitForKeyboardHeight = (defaultKeyboardHeight: number) => {
     const callback = (ev: any) => {
       currentKeyboardHeight = ev.keyboardHeight;
       resolve(currentKeyboardHeight);
-      window.removeEventListener('keyboardWillOpen', callback);
+      window.removeEventListener('keyboardWillShow', callback);
 
       clearTimeout(timeout);
       timeout = undefined;
     }
-    window.addEventListener('keyboardWillOpen', callback);
+    window.addEventListener('keyboardWillShow', callback);
 
     // Set a timeout in case keyboardWillOpen never fires
     timeout = setTimeout(() => callback({ keyboardHeight: defaultKeyboardHeight }), 1000);
@@ -111,8 +118,25 @@ const adjustInputScroll = async (
   const safeAreaTop = contentBox.top;
   const safeAreaBottom = contentBox.height - currentKeyboardHeight;
 
-  const scrollByBottom = inputBox.bottom - safeAreaBottom;
+  /**
+   * getBoundingClientRect values are relative to the
+   *  viewport, but we want values relative to ion-content.
+   */
+  const scrollByBottom = (inputBox.bottom - contentBox.top) - safeAreaBottom;
   const scrollByTop = inputBox.top - safeAreaTop;
+
+  console.log('current keyboard height', currentKeyboardHeight, defaultKeyboardHeight);
+  console.log('Safe area', safeAreaTop, safeAreaBottom);
+  console.log('Scroll by', scrollByTop, scrollByBottom);
+  console.log('input box', inputBox);
+  console.log('content box', contentBox);
+
+  /**
+   * If we scroll just enough to bring the
+   * input into view, it may be touch the top
+   * of the keyboard, so we add a bit of padding.
+   */
+  const scrollPadding = 15;
 
   /**
    * If true then the input extends
@@ -122,7 +146,7 @@ const adjustInputScroll = async (
    */
   if (scrollByBottom > 0) {
     console.log('scrolling down', scrollByBottom)
-    await contentEl.scrollByPoint(0, scrollByBottom, 300);
+    await contentEl.scrollByPoint(0, scrollByBottom + scrollPadding, 300);
   /**
    * If true then the input extends
    * outside the top safe area and
@@ -131,7 +155,7 @@ const adjustInputScroll = async (
    */
   } else if (scrollByTop < 0) {
     console.log('scrolling up', scrollByTop)
-    await contentEl.scrollByPoint(0, scrollByTop, 300);
+    await contentEl.scrollByPoint(0, scrollByTop - scrollPadding, 300);
   }
 }
 
