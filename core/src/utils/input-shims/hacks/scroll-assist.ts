@@ -1,4 +1,4 @@
-import { pointerCoord } from '../../helpers';
+import { pointerCoord, raf } from '../../helpers';
 
 import { isFocused, relocateInput } from './common';
 import { getScrollData } from './scroll-data';
@@ -108,11 +108,30 @@ const adjustInputScroll = async (
 
   await waitForKeyboardHeight(defaultKeyboardHeight);
 
+  const safeAreaTop = contentBox.top;
   const safeAreaBottom = contentBox.height - currentKeyboardHeight;
-  const scrollBy = inputBox.bottom - safeAreaBottom;
 
-  if (scrollBy > 0) {
-    await contentEl.scrollByPoint(0, scrollBy, 300);
+  const scrollByBottom = inputBox.bottom - safeAreaBottom;
+  const scrollByTop = inputBox.top - safeAreaTop;
+
+  /**
+   * If true then the input extends
+   * outside the bottom safe area and
+   * we should scroll the content down
+   * to bring the input back into view.
+   */
+  if (scrollByBottom > 0) {
+    console.log('scrolling down', scrollByBottom)
+    await contentEl.scrollByPoint(0, scrollByBottom, 300);
+  /**
+   * If true then the input extends
+   * outside the top safe area and
+   * we should scroll the content up
+   * to bring the input back into view.
+   */
+  } else if (scrollByTop < 0) {
+    console.log('scrolling up', scrollByTop)
+    await contentEl.scrollByPoint(0, scrollByTop, 300);
   }
 }
 
@@ -138,7 +157,8 @@ const jsSetFocus = async (
    * as the input will be moved in the next
    * `relocateInput` call.
    */
-  const inputBox = inputEl.getBoundingClientRect();
+  const containerEl = inputEl.closest('ion-item') || inputEl;
+  const inputBox = containerEl.getBoundingClientRect();
 
   /**
    * Temporarily move the focus to a placeholder element
@@ -155,9 +175,17 @@ const jsSetFocus = async (
     /**
      * Now that we have scrolled the input into view, relocate
      * it from off screen and focus the input.
+     * Wrap it in two rafs to ensure that code gets run
+     * in the frame after scrolling is done. The function that
+     * scrolls the content uses an raf itself which is why
+     * 2 rafs are required here.
      */
-    relocateInput(componentEl, inputEl, false, scrollData.inputSafeY);
-    inputEl.focus();
+    raf(() => {
+      raf(() => {
+        relocateInput(componentEl, inputEl, false, scrollData.inputSafeY);
+        inputEl.focus();
+      });
+    });
   }
 };
 
