@@ -3,7 +3,7 @@ import { pointerCoord } from '../../helpers';
 import { isFocused, relocateInput } from './common';
 import { getScrollData } from './scroll-data';
 
-let keyboardHeight = 0;
+let currentKeyboardHeight = 0;
 
 export const enableScrollAssist = (
   componentEl: HTMLElement,
@@ -56,32 +56,46 @@ const waitForKeyboardHeight = (defaultKeyboardHeight: number) => {
    * If the keyboard is already open
    * no need to wait for the event.
    */
-  if (keyboardHeight > 0) {
-    return Promise.resolve(keyboardHeight)
+  if (currentKeyboardHeight > 0) {
+    return Promise.resolve(currentKeyboardHeight)
   }
 
   /**
    * If not in Capacitor environment, just make
-   * an educated guess at the height of the keyboard
+   * an educated guess at the height of the keyboard.
+   * Developers can customize this using the keyboardHeight
+   * config option.
+   *
+   * TODO: Add Cordova support
+   *
+   * TODO: Should we expand this to allow for functions
+   * so that developers can write custom heuristics
+   * for estimating the keyboard height?
    */
   if (!win.Capacitor?.isPluginAvailable('Keyboard')) {
-    keyboardHeight = defaultKeyboardHeight;
-    return Promise.resolve(keyboardHeight);
+    currentKeyboardHeight = defaultKeyboardHeight;
+    return Promise.resolve(currentKeyboardHeight);
   }
 
   /**
-   * If keyboard is not open yet
-   * we need to wait for the event
-   * to fire and get the height of
-   * the keyboard.
+   * If keyboard is not open yet we need to
+   * wait for the event to fire and get the
+   * height of the keyboard.
    */
   return new Promise(resolve => {
+    let timeout: any;
     const callback = (ev: any) => {
-      keyboardHeight = ev.keyboardHeight;
-      resolve(keyboardHeight);
+      currentKeyboardHeight = ev.keyboardHeight;
+      resolve(currentKeyboardHeight);
       window.removeEventListener('keyboardWillOpen', callback);
+
+      clearTimeout(timeout);
+      timeout = undefined;
     }
     window.addEventListener('keyboardWillOpen', callback);
+
+    // Set a timeout in case keyboardWillOpen never fires
+    timeout = setTimeout(() => callback({ keyboardHeight: defaultKeyboardHeight }), 1000);
   });
 }
 
@@ -94,7 +108,7 @@ const adjustInputScroll = async (
 
   await waitForKeyboardHeight(defaultKeyboardHeight);
 
-  const safeAreaBottom = contentBox.height - keyboardHeight;
+  const safeAreaBottom = contentBox.height - currentKeyboardHeight;
   const scrollBy = inputBox.bottom - safeAreaBottom;
 
   if (scrollBy > 0) {
@@ -119,11 +133,18 @@ const jsSetFocus = async (
     return;
   }
 
+  /**
+   * We need to get the bounding box here
+   * as the input will be moved in the next
+   * `relocateInput` call.
+   */
   const inputBox = inputEl.getBoundingClientRect();
 
-  // temporarily move the focus to the focus holder so the browser
-  // doesn't freak out while it's trying to get the input in place
-  // at this point the native text input still does not have focus
+  /**
+   * Temporarily move the focus to a placeholder element
+   * off screen so that browsers such as Safari do not
+   * try to automatically scroll the input into focus.
+   */
   relocateInput(componentEl, inputEl, true, scrollData.inputSafeY);
   inputEl.focus();
 
@@ -131,10 +152,11 @@ const jsSetFocus = async (
   if (typeof window !== 'undefined' && contentEl) {
     await adjustInputScroll(inputBox, contentEl!, keyboardHeight);
 
-    // the ll view is ie correct position now
-    // give the native text input focus
+    /**
+     * Now that we have scrolled the input into view, relocate
+     * it from off screen and focus the input.
+     */
     relocateInput(componentEl, inputEl, false, scrollData.inputSafeY);
-    // ensure this is the focused input
     inputEl.focus();
   }
 };
