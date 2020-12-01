@@ -60,26 +60,19 @@ export const enableScrollAssist = (
 const waitForKeyboardHeight = (defaultKeyboardHeight: number) => {
   const win = window as any;
   /**
-   * If the keyboard is already open
-   * no need to wait for the event.
-   */
-  if (currentKeyboardHeight > 0) {
-    return Promise.resolve(currentKeyboardHeight)
-  }
-
-  /**
    * If not in Capacitor environment, just make
    * an educated guess at the height of the keyboard.
    * Developers can customize this using the keyboardHeight
    * config option.
    *
-   * TODO: Add Cordova support
-   *
    * TODO: Should we expand this to allow for functions
    * so that developers can write custom heuristics
    * for estimating the keyboard height?
    */
-  if (!win.Capacitor?.isPluginAvailable('Keyboard')) {
+  if (
+      !win.Capacitor?.isPluginAvailable('Keyboard') &&
+      (!win.cordova && !win.Keyboard)
+    ) {
     currentKeyboardHeight = defaultKeyboardHeight;
     return Promise.resolve(currentKeyboardHeight);
   }
