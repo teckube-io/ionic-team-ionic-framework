@@ -57,23 +57,42 @@ export const enableScrollAssist = (
   };
 };
 
-const waitForKeyboardHeight = (defaultKeyboardHeight: number) => {
+const waitForKeyboardHeight = (
+  inputEl: HTMLInputElement | HTMLTextAreaElement,
+  defaultKeyboardHeight: number
+) => {
   const win = window as any;
   /**
    * If not in Capacitor environment, just make
    * an educated guess at the height of the keyboard.
    * Developers can customize this using the keyboardHeight
    * config option.
-   *
-   * TODO: Should we expand this to allow for functions
-   * so that developers can write custom heuristics
-   * for estimating the keyboard height?
    */
   if (
-      !win.Capacitor?.isPluginAvailable('Keyboard') &&
-      (!win.cordova && !win.Keyboard)
-    ) {
+    !win.Capacitor?.isPluginAvailable('Keyboard') &&
+    (!win.cordova && !win.Keyboard)
+  ) {
     currentKeyboardHeight = defaultKeyboardHeight;
+
+    /**
+     * If input type is password then iOS will show
+     * a "Passwords" accessory bar that lets users
+     * grab a password from their keychain. If
+     * autocorrect is on then iOS will show the
+     * predictive text accessory bar (if enabled
+     * in Settings). Either way, we need to account
+     * for this by adding ~20px to the approximate
+     * keyboard height. The accessory bar is about
+     * 50px tall, but it is only about 20px taller
+     * than our keyboard height estimate.
+     */
+    if (
+      inputEl.type === 'password' ||
+      (inputEl as any).autocorrect === true
+    ) {
+      currentKeyboardHeight += 20;
+    }
+
     return Promise.resolve(currentKeyboardHeight);
   }
 
@@ -100,13 +119,14 @@ const waitForKeyboardHeight = (defaultKeyboardHeight: number) => {
 }
 
 const adjustInputScroll = async (
+  inputEl: HTMLInputElement | HTMLTextAreaElement,
   inputBox: DOMRect,
   contentEl: HTMLIonContentElement,
   defaultKeyboardHeight: number
 ) => {
   const contentBox = contentEl.getBoundingClientRect();
 
-  await waitForKeyboardHeight(defaultKeyboardHeight);
+  await waitForKeyboardHeight(inputEl, defaultKeyboardHeight);
 
   const safeAreaTop = contentBox.top;
   const safeAreaBottom = contentBox.height - currentKeyboardHeight;
@@ -115,14 +135,16 @@ const adjustInputScroll = async (
    * getBoundingClientRect values are relative to the
    *  viewport, but we want values relative to ion-content.
    */
+
+  // TODO: This value is inaccurate when webview resizing is enabled
   const scrollByBottom = (inputBox.bottom - contentBox.top) - safeAreaBottom;
   const scrollByTop = inputBox.top - safeAreaTop;
 
-  console.log('current keyboard height', currentKeyboardHeight, defaultKeyboardHeight);
+  /*console.log('current keyboard height', currentKeyboardHeight, defaultKeyboardHeight);
   console.log('Safe area', safeAreaTop, safeAreaBottom);
   console.log('Scroll by', scrollByTop, scrollByBottom);
   console.log('input box', inputBox);
-  console.log('content box', contentBox);
+  console.log('content box', contentBox);*/
 
   /**
    * If we scroll just enough to bring the
@@ -138,7 +160,7 @@ const adjustInputScroll = async (
    * to bring the input back into view.
    */
   if (scrollByBottom > 0) {
-    console.log('scrolling down', scrollByBottom)
+    //console.log('scrolling down', scrollByBottom)
     await contentEl.scrollByPoint(0, scrollByBottom + scrollPadding, 300);
   /**
    * If true then the input extends
@@ -147,7 +169,7 @@ const adjustInputScroll = async (
    * to bring the input back into view.
    */
   } else if (scrollByTop < 0) {
-    console.log('scrolling up', scrollByTop)
+    //console.log('scrolling up', scrollByTop)
     await contentEl.scrollByPoint(0, scrollByTop - scrollPadding, 300);
   }
 }
@@ -187,7 +209,7 @@ const jsSetFocus = async (
 
   /* tslint:disable-next-line */
   if (typeof window !== 'undefined' && contentEl) {
-    await adjustInputScroll(inputBox, contentEl!, keyboardHeight);
+    await adjustInputScroll(inputEl, inputBox, contentEl!, keyboardHeight);
 
     /**
      * Now that we have scrolled the input into view, relocate

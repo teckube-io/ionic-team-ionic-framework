@@ -40,8 +40,13 @@ const setScrollPadding = (input: HTMLElement, keyboardHeight: number) => {
     clearTimeout(timer);
   }
 
+  let keyboardOffset = keyboardHeight;
+  if ((input as any).type === 'password' || (input as any).autocorrect === true) {
+    keyboardOffset += 50;
+  }
+
   if (keyboardHeight > 0) {
-    el.style.setProperty('--keyboard-offset', `${keyboardHeight}px`);
+    el.style.setProperty('--keyboard-offset', `${keyboardOffset}px`);
   } else {
     (el as any)[PADDING_TIMER_KEY] = setTimeout(() => {
       el.style.setProperty('--keyboard-offset', '0px');
