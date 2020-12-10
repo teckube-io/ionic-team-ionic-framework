@@ -18,6 +18,8 @@ export * from './components/Overlays';
 
 export { IonKeyboardRef, IonRouter, useBackButton, useIonRouter, useKeyboard } from './hooks';
 
+export { mockIonicVue } from './mocks/index';
+
 export {
   modalController,
   popoverController
