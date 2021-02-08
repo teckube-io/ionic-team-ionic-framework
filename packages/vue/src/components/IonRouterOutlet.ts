@@ -181,6 +181,10 @@ export const IonRouterOutlet = defineComponent({
           return resolve(false);
         }
 
+        if (hasRunningTask) {
+          return resolve(false);
+        }
+
         requestAnimationFrame(() => {
           requestAnimationFrame(async () => {
             enteringEl.classList.add('ion-page-invisible');
