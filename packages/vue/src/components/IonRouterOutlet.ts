@@ -22,6 +22,7 @@ export const IonRouterOutlet = defineComponent({
     const route = useRoute();
     const depth = inject(viewDepthKey, 0);
     let usingDeprecatedRouteSetup = false;
+    let hasRunningTask: boolean = false;
 
     // TODO: Remove in Ionic Vue v6.0
     if (attrs.tabs && route.matched[depth]?.children?.length > 0) {
@@ -70,6 +71,8 @@ export const IonRouterOutlet = defineComponent({
     });
 
     const canStart = () => {
+      if (hasRunningTask) return false;
+
       const config = getConfig();
       const swipeEnabled = config && config.get('swipeBackEnabled', ionRouterOutlet.value.mode === 'ios');
       if (!swipeEnabled) return false;
@@ -182,6 +185,7 @@ export const IonRouterOutlet = defineComponent({
           requestAnimationFrame(async () => {
             enteringEl.classList.add('ion-page-invisible');
 
+            hasRunningTask = true;
             const result = await ionRouterOutlet.value.commit(enteringEl, leavingEl, {
               deepWait: true,
               duration: direction === undefined || direction === 'root' || direction === 'none' ? 0 : undefined,
@@ -190,6 +194,7 @@ export const IonRouterOutlet = defineComponent({
               progressAnimation,
               animationBuilder
             });
+            hasRunningTask = false;
 
             return resolve(result);
           });
