@@ -38,7 +38,10 @@ describe('Routing', () => {
     cy.visit('http://localhost:8080');
 
     cy.get('#routing').click();
+    cy.ionPageHidden('home');
+
     cy.get('#child').click();
+    cy.ionPageHidden('routing');
 
     cy.ionBackClick('routingchild');
     cy.ionBackClick('routing');
@@ -54,6 +57,7 @@ describe('Routing', () => {
 
     cy.get('#parameter-abc').click();
     cy.ionPageVisible('routingparameter');
+    cy.ionPageHidden('routing');
     cy.get('[data-pageid=routingparameter] #parameter-value').should('have.text', 'abc');
     cy.ionBackClick('routingparameter');
 
@@ -70,7 +74,7 @@ describe('Routing', () => {
 
     cy.get('#parameter-abc').click();
     cy.ionPageVisible('routingparameter');
-
+    cy.ionPageHidden('routing');
     cy.get('#parameter-view').click();
 
     cy.ionPageVisible('routingparameterview');

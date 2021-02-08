@@ -22,6 +22,8 @@ describe('Tabs', () => {
     cy.visit('http://localhost:8080/tabs')
 
     cy.get('#child-one').click();
+    cy.ionPageHidden('tab1');
+    cy.ionPageVisible('tab1childone');
 
     cy.get('ion-tab-button#tab-button-tab2').click();
     cy.ionPageVisible('tab2');
@@ -40,6 +42,8 @@ describe('Tabs', () => {
     cy.visit('http://localhost:8080/tabs')
 
     cy.get('#child-one').click();
+    cy.ionPageHidden('tab1');
+    cy.ionPageVisible('tab1childone');
 
     cy.get('ion-tab-button#tab-button-tab2').click();
     cy.ionPageVisible('tab2');
