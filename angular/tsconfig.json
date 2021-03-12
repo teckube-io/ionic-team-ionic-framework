@@ -7,7 +7,8 @@
     "skipTemplateCodegen": true,
     "fullTemplateTypeCheck": false,
     "enableResourceInlining": true,
-    "enableIvy": false
+    "enableIvy": true,
+    "compilationMode": "partial"
   },
   "compilerOptions": {
     "alwaysStrict": true,

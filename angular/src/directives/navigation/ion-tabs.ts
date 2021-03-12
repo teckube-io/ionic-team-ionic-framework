@@ -95,7 +95,7 @@ export class IonTabs {
       const activeView = this.outlet.getLastRouteView(activeStackId);
 
       // If on root tab, do not navigate to root tab again
-      if (activeView.url === tabRootUrl) { return; }
+      if (activeView?.url === tabRootUrl) { return; }
 
       const rootView = this.outlet.getRootView(tab);
       const navigationExtras = rootView && tabRootUrl === rootView.url && rootView.savedExtras;

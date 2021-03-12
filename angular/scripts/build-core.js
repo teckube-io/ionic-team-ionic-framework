@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const spawn = require('child_process').spawn;
 
-const stencilPath = path.join(__dirname, '..', '..', 'core', 'node_modules', '.bin');
 const typescriptPath = path.join(__dirname, '..', 'node_modules', '.bin');
 
 function copyIonicons() {
@@ -59,5 +58,5 @@ function copySchematicsJson(){
 
 copyIonicons();
 copyCSS();
-buildSchematics();
-copySchematicsJson()
+// buildSchematics();
+// copySchematicsJson()

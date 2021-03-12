@@ -1,9 +1,9 @@
-import { AfterViewInit, ElementRef, HostListener, Injector, OnDestroy, Type } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, Injector, OnDestroy  } from '@angular/core';
 import { ControlValueAccessor, NgControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { raf } from '../../util/util';
-
+@Directive({})
 export class ValueAccessor implements ControlValueAccessor, AfterViewInit, OnDestroy {
 
   private onChange: (value: any) => void = () => {/**/};
@@ -64,7 +64,7 @@ export class ValueAccessor implements ControlValueAccessor, AfterViewInit, OnDes
   ngAfterViewInit() {
     let ngControl;
     try {
-      ngControl = this.injector.get<NgControl>(NgControl as Type<NgControl>);
+      ngControl = this.injector.get<NgControl>(NgControl);
     } catch { /* No FormControl or ngModel binding */ }
 
     if (!ngControl) { return; }
