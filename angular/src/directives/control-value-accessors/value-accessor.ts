@@ -84,13 +84,13 @@ export class ValueAccessor implements ControlValueAccessor, AfterViewInit, OnDes
      * This patches the methods to manually sync
      * the classes until this feature is implemented in Angular.
      */
-    const formControl = ngControl.control;
+    const formControl = (ngControl.control as any);
     if (formControl) {
       const methodsToPatch = ['markAsTouched', 'markAllAsTouched', 'markAsUntouched', 'markAsDirty', 'markAsPristine'];
       methodsToPatch.forEach(method => {
        if (formControl[method]) {
          const oldFn = formControl[method].bind(formControl);
-         formControl[method] = (...params) => {
+         formControl[method] = (...params: any[]) => {
            oldFn(...params);
            setIonicClasses(this.el);
           };
