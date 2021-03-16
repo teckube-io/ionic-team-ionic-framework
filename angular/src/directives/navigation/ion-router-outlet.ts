@@ -5,7 +5,7 @@ import { componentOnReady } from '@ionic/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
 
-import { AnimationBuilder } from '../../';
+import { AnimationBuilder } from '../../ionic-core';
 import { Config } from '../../providers/config';
 import { NavController } from '../../providers/nav-controller';
 

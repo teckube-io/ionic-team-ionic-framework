@@ -42,8 +42,5 @@ export * from './types/ionic-lifecycle-hooks';
 // PACKAGE MODULE
 export { IonicModule } from './ionic-module';
 
-// UTILS
-export { IonicSafeString, getPlatforms, isPlatform, createAnimation } from '@ionic/core';
-
-// CORE TYPES
-export { Animation, AnimationBuilder, AnimationCallbackOptions, AnimationDirection, AnimationFill, AnimationKeyFrames, AnimationLifecycle, Gesture, GestureConfig, GestureDetail, mdTransitionAnimation, iosTransitionAnimation, NavComponentWithProps } from '@ionic/core';
+// CORE EXPORTS
+export * from './ionic-core';
